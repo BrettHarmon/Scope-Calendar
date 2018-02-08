@@ -18,14 +18,49 @@ class LoginBox extends React.Component {
         super(props);
         this.state = {username : '',
                       password : '',
-                      email : ''};
+                      email : '',
+                      userId: ''};
     }
 
     createAccount(event) {
-        var username = this.state.username;
-        var password = this.state.password;
+        let username = this.state.username;
+        let password = this.state.password;
+        let email = this.state.email;
         console.log(username);
         console.log(password);
+
+        return (fetch('http://10.128.65.175:8080/signup', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+                email: email,
+            })
+        })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                console.log(JSON.stringify(responseJson));
+            })
+            .catch((error) => {
+                console.error(error);
+            }))
+        /*return fetch('http://10.128.65.175:8080/test')
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    userId: responseJson.userId,
+                }, function() {
+                    // do something with new state
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+            });*/
+
     }
 
     render() {

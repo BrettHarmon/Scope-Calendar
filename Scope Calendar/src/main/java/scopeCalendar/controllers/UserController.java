@@ -11,9 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,21 +32,31 @@ public class UserController {
 	
 	
 	@PostMapping(value = {"/signup"}, produces = "application/json")
-	public ResponseEntity<?> createAccount(@RequestParam(required = true) String password,
-									@RequestParam(required = true) String email,
-									@RequestParam(required = true) String username, UriComponentsBuilder ucb, 
+	public ResponseEntity<?> createAccount(@RequestBody User userInput, UriComponentsBuilder ucb, 
 									Model model)  {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(ucb.path("/home").build().toUri());
 		System.out.println(headers.getLocation().toString());
 		User user = new User();
-		user.setEmail(email);
-		user.setPassword(password);
-		user.setUsername(username);
+		user.setEmail(userInput.getEmail());
+		user.setPassword(userInput.getPassword());
+		user.setUsername(userInput.getUsername());
 		userRepository.save(user);
 
 
 		return new ResponseEntity<User>(user, headers, HttpStatus.CREATED);
+		
+	}
+	
+	@GetMapping({"/test"})
+	@ResponseBody
+	public User test() {
+		
+		System.out.println("HELLO ANDROID");
+		User user = new User();
+		user.setEmail("email@email.com");
+		return user;
+		
 		
 	}
 	
