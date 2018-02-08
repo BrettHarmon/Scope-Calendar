@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import scopeCalendar.services.CustomUserDetailsService;
 
 
-public class SecurityConfig {
 
 	@Configuration
 	@EnableWebSecurity
@@ -26,7 +25,7 @@ public class SecurityConfig {
 		
 		@Bean
 		public PasswordEncoder encoder() {
-		    return new BCryptPasswordEncoder(11);
+		    return new BCryptPasswordEncoder();
 		}
 
 		
@@ -44,6 +43,7 @@ public class SecurityConfig {
 	        http
 	            .authorizeRequests()
 	                .antMatchers("/", "/home", "/signup").permitAll()
+	                .antMatchers("/test").authenticated()
 	                .and()
 	            .formLogin()
 	                .loginPage("/login").permitAll()
@@ -54,6 +54,8 @@ public class SecurityConfig {
 	                .and()
 	            .logout()
 	                .permitAll();
+	        
+	        http.csrf().disable();
 	    }
 		
 		@Override
@@ -63,4 +65,3 @@ public class SecurityConfig {
 	    
 
 	}
-}

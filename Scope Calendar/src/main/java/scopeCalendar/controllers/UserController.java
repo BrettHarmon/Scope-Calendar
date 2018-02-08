@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import scopeCalendar.models.User;
 import scopeCalendar.repos.UserRepository;
+import scopeCalendar.services.UserService;
 
 
 @Controller
@@ -29,6 +30,9 @@ public class UserController {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	private UserService userService;
 	
 	
 	@PostMapping(value = {"/signup"}, produces = "application/json")
@@ -41,7 +45,7 @@ public class UserController {
 		user.setEmail(userInput.getEmail());
 		user.setPassword(userInput.getPassword());
 		user.setUsername(userInput.getUsername());
-		userRepository.save(user);
+		userService.createUser(user);
 
 
 		return new ResponseEntity<User>(user, headers, HttpStatus.CREATED);
