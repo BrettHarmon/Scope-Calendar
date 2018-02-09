@@ -38,17 +38,32 @@ public class UserController {
 	@PostMapping(value = {"/signup"}, produces = "application/json")
 	public ResponseEntity<?> createAccount(@RequestBody User userInput, UriComponentsBuilder ucb, 
 									Model model)  {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(ucb.path("/home").build().toUri());
-		System.out.println(headers.getLocation().toString());
+		
+		String error = "";
+		
+		if (userInput.getEmail().isEmpty() || userInput.getPassword().isEmpty()
+				|| userInput.getUsername().isEmpty() ) {
+			error = "Please fill in all the fields";
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+		}
+		
+		if (userRepository.findByEmail(userInput.getEmail()) != null) {
+			error = "Email already exists";
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+		}
+		if (userRepository.findByUsername(userInput.getUsername()) != null) {
+			error = "Username already exists";
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+		}
+		
 		User user = new User();
 		user.setEmail(userInput.getEmail());
 		user.setPassword(userInput.getPassword());
 		user.setUsername(userInput.getUsername());
 		userService.createUser(user);
+		
 
-
-		return new ResponseEntity<User>(user, headers, HttpStatus.CREATED);
+		return ResponseEntity.status(HttpStatus.CREATED).body(user);
 		
 	}
 	

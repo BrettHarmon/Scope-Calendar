@@ -5,14 +5,34 @@ import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 
 export default class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {userId: ''};
+        this.userLoggedIn = this.userLoggedIn.bind(this);
+    }
+
+    userLoggedIn(userId) {
+        this.setState({userId: userId});
+    }
   render() {
+        if (this.state.userId == '') {
     return (
       <View>
         <Text>Welcome to Scope Calendar</Text>
         <Text>Changes you make will automatically reload.</Text>
-        <LoginBox></LoginBox>
+        <LoginBox loggedIn={this.userLoggedIn}></LoginBox>
+          <Text> {this.state.userId} </Text>
       </View>
-    );
+    ); }
+    else {
+            return (
+                <View>
+                    <Text>Welcome to Scope Calendar</Text>
+                    <Text>You have been logged in</Text>
+                    <Text> Welcome {this.state.userId.username} ! </Text>
+                </View>
+            );
+        }
   }
 }
 
@@ -29,9 +49,9 @@ class LoginBox extends React.Component {
         let username = this.state.username;
         let password = this.state.password;
         let email = this.state.email;
-        console.log(username);
-        console.log(password);
-
+        //console.log(username);
+        //console.log(password);
+        var that = this;
         return (fetch( Setting.HOME_URL + '/signup', {
 
             method: 'POST',
@@ -44,14 +64,27 @@ class LoginBox extends React.Component {
                 password: password,
                 email: email,
             })
-        })
-            .then((response) => response.json())
-            .then((responseJson) => {
-                console.log(JSON.stringify(responseJson));
-            })
+        }))
+            .then(function(response) { if (!response.ok) {
+                response.text().then(function (text) {
+                    console.log(text);
+                });
+            } else {
+                response.json().then(function (json) {
+                    console.log(JSON.stringify(json));
+                    that.setState(function(previousState) {
+                        return {userId : json.userId}
+                    });
+                    console.log(that.state.userId);
+                    that.props.loggedIn(json);
+
+                })
+            }
+    })
             .catch((error) => {
                 console.error(error);
-            }))
+            });
+    }
         /*return fetch('http://10.128.65.175:8080/test')
             .then((response) => response.json())
             .then((responseJson) => {
@@ -65,7 +98,6 @@ class LoginBox extends React.Component {
                 console.error(error);
             });*/
 
-    }
 
     render() {
         return (
