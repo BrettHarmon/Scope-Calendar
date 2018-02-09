@@ -22,7 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import scopeCalendar.models.User;
 import scopeCalendar.repos.UserRepository;
-import scopeCalendar.services.UserService;
+import scopeCalendar.services.IUserService;
 
 
 @Controller
@@ -32,7 +32,7 @@ public class UserController {
 	UserRepository userRepository;
 	
 	@Autowired
-	private UserService userService;
+	private IUserService userService;
 	
 	
 	@PostMapping(value = {"/signup"}, produces = "application/json")

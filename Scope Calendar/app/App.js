@@ -1,3 +1,6 @@
+import * as Setting from './Settings.js' //Include on every page
+import Nav from './Nav'
+
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 
@@ -29,7 +32,8 @@ class LoginBox extends React.Component {
         console.log(username);
         console.log(password);
 
-        return (fetch('http://10.128.65.175:8080/signup', {
+        return (fetch( Setting.HOME_URL + '/signup', {
+
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -66,6 +70,7 @@ class LoginBox extends React.Component {
     render() {
         return (
             <View>
+                <Nav type="login" onPress = {() => this.props.navigator.replace({id:'home'})} />
                 <TextInput
 
                     onChangeText={(username) => this.setState({username})}
