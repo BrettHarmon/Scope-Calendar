@@ -13,7 +13,7 @@ import {
 
 import Icon from 'react-native-vector-icons/MaterialIcons'; //https://material.io/icons/
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
-import * as Setting from './Settings.js'
+import * as Settings from './Settings.js'
 
 export default class Nav extends Component {
 

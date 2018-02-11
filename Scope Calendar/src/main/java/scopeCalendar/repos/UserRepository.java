@@ -8,7 +8,6 @@ import scopeCalendar.models.User;
 
 
 public interface UserRepository extends JpaRepository<User, Long> {
-	User findByEmail(String arg0);
-	User findByUsername(String arg0);
-	User fineByUsernameOrEmail(String query);
+	User findByEmailIgnoreCase(String arg0);
+	User findByUsernameIgnoreCase(String arg0);
 }

@@ -1,10 +1,148 @@
-import * as Setting from './Settings.js' //Include on every page
-import Nav from './Nav'
-
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { Image,Text,Button,TextInput,TouchableOpacity,View,} from 'react-native';
+import {StackNavigator} from 'react-navigation'; //https://reactnavigation.org/docs
+var styles = require('./Styles.js');
 
-export default class App extends React.Component {
+//import * as Settings from './Settings.js' //Include on every page
+//import Nav from './Nav'
+import { CreateAccountScreen } from './CreateAccount'
+import { DetailsScreen } from './Index'
+import { LoggedInHome } from './Index'
+
+
+
+
+
+
+class HomeScreen extends React.Component {
+    static navigationOptions = {
+        title: 'Home',
+    };
+
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Home Screen</Text>
+            <Button
+              title="Sign Up"
+              onPress={() => this.props.navigation.navigate('CreateAccount')}
+            />
+      </View>
+    );
+  }
+}
+
+
+const RootStack = StackNavigator(
+  {
+    Home: {
+      screen: HomeScreen,
+    },
+    Details: {
+      screen: DetailsScreen,
+    },
+    CreateAccount: {
+        screen: CreateAccountScreen,
+    },
+    Created: {
+        screen: LoggedInHome,
+    }
+  },
+  {
+    initialRouteName: 'Home',
+    //initialRouteName: 'Created', //TODO delete me
+    navigationOptions: {
+     headerStyle: {
+       backgroundColor: '#f4511e',
+     },
+     headerTintColor: '#fff',
+     headerTitleStyle: {
+       fontWeight: 'bold',
+     },
+ },
+  }
+);
+
+export default RootStack;
+
+/*export default class App extends React.Component {
+  render() {
+    return <RootStack />;
+  }
+}*/
+
+
+
+
+
+
+
+
+/*export default class App extends React.Component {
+    constructor(props){
+        super(props)
+    }
+    render(){
+        <Home></Home>
+    }
+}*/
+
+/*class HomeScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Welcome',
+  };
+  render() {
+    const { navigate } = this.props.navigation;
+    return (
+      <Button
+        title="Go to Jane's profile"
+        onPress={() =>
+          navigate('Profile', { name: 'Jane' })
+        }
+      />
+    );
+  }
+}*/
+
+    /*renderScene(route, navigator) {
+      var {state,actions} = this.props;
+      var routeId = route.id;
+      //every view gets an route name (might want to great ENUM list)
+      if (routeId === 'home') {
+        return (
+          <Home
+          {...this.props}
+          userData ={route.userData}
+          navigator={navigator}
+          />
+          );
+      }
+      /*if (routeId === 'signup') {
+        return (
+          <Messages
+          {...this.props}
+          userData ={route.userData}
+          navigator={navigator} />
+          );
+      }*/
+
+
+
+    /*render() {
+        return (
+          <View style={{flex:1}}>
+               <Navigator
+               style={{flex: 1}}
+               ref={'NAV'}
+               initialRoute={{id: 'home', name: 'home'}}
+               renderScene={this.renderScene.bind(this)}/>
+           </View>
+          )
+      }*/
+
+
+
+    /*
     constructor(props) {
         super(props);
         this.state = {userId: ''};
@@ -29,112 +167,9 @@ export default class App extends React.Component {
                 <View>
                     <Text>Welcome to Scope Calendar</Text>
                     <Text>You have been logged in</Text>
-                    <Text> Welcome {this.state.userId.username} ! </Text>
+                    <Text> Welcome {this.state.userId.username}! </Text>
                 </View>
             );
         }
   }
-}
-
-class LoginBox extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {username : '',
-                      password : '',
-                      email : '',
-                      userId: ''};
-    }
-
-    createAccount(event) {
-        let username = this.state.username;
-        let password = this.state.password;
-        let email = this.state.email;
-        //console.log(username);
-        //console.log(password);
-        var that = this;
-        return (fetch( Setting.HOME_URL + '/signup', {
-
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-                email: email,
-            })
-        }))
-            .then(function(response) { if (!response.ok) {
-                response.text().then(function (text) {
-                    console.log(text);
-                });
-            } else {
-                response.json().then(function (json) {
-                    console.log(JSON.stringify(json));
-                    that.setState(function(previousState) {
-                        return {userId : json.userId}
-                    });
-                    console.log(that.state.userId);
-                    that.props.loggedIn(json);
-
-                })
-            }
-    })
-            .catch((error) => {
-                console.error(error);
-            });
-    }
-        /*return fetch('http://10.128.65.175:8080/test')
-            .then((response) => response.json())
-            .then((responseJson) => {
-                this.setState({
-                    userId: responseJson.userId,
-                }, function() {
-                    // do something with new state
-                });
-            })
-            .catch((error) => {
-                console.error(error);
-            });*/
-
-
-    render() {
-        return (
-            <View>
-                <Nav type="login" onPress = {() => this.props.navigator.replace({id:'home'})} />
-                <TextInput
-
-                    onChangeText={(username) => this.setState({username})}
-                    value={this.state.username}
-                />
-                <TextInput
-
-                    onChangeText={(email) => this.setState({email})}
-                    value={this.state.email}
-                />
-                <TextInput
-
-                    onChangeText={(password) => this.setState({password})}
-                    value={this.state.password}
-                />
-                <Button title="Create Account" onPress={this.createAccount.bind(this)}>
-
-                </Button>
-
-
-            </View>
-        )
-    }
-
-
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  */
