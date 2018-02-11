@@ -45,6 +45,7 @@ public class UserController {
 		
 		String error = "";
 		
+		// -- General errors
 		if (userInput.getUser().getEmail().trim().isEmpty() || userInput.getUser().getPassword().trim().isEmpty()
 				|| userInput.getUser().getUsername().trim().isEmpty() || userInput.getPassword2().isEmpty() ) {
 			error = "Please fill in all the fields.";
@@ -53,19 +54,7 @@ public class UserController {
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		
-		if(!userInput.password2.equals(userInput.getUser().getPassword())) {
-			error = "Passwords don't match. Try again.";
-			HashMap<String, String> resp = new HashMap<>();
-			resp.put("passwordError", error);
-			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
-		}
-		
-		if (userRepository.findByEmailIgnoreCase(userInput.getUser().getEmail()) != null) {
-			error = "Email already exists.";
-			HashMap<String, String> resp = new HashMap<>();
-			resp.put("emailError", error);
-			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
-		}
+		// -- Username errors
 		String username = null;
 		if (userRepository.findByUsernameIgnoreCase(username = userInput.getUser().getUsername()) != null) {
 			error = "Username already exists.";
@@ -78,6 +67,29 @@ public class UserController {
 			error = "Usernames may only contain letters, numbers and spaces.";
 			HashMap<String, String> resp = new HashMap<>();
 			resp.put("usernameError", error);
+			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
+		}
+		
+		// -- Email errors
+		String email = null;
+		if (userRepository.findByEmailIgnoreCase(email = userInput.getUser().getEmail()) != null) {
+			error = "Email already exists.";
+			HashMap<String, String> resp = new HashMap<>();
+			resp.put("emailError", error);
+			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
+		}
+		if(!email.contains("@")) {
+			error = "Enter valid Email address.";
+			HashMap<String, String> resp = new HashMap<>();
+			resp.put("emailError", error);
+			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
+		}
+
+		// -- Password Errors
+		if(!userInput.password2.equals(userInput.getUser().getPassword())) {
+			error = "Passwords don't match. Try again.";
+			HashMap<String, String> resp = new HashMap<>();
+			resp.put("passwordError", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		
