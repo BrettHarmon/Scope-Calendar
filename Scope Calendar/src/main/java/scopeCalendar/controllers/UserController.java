@@ -49,35 +49,35 @@ public class UserController {
 				|| userInput.getUser().getUsername().trim().isEmpty() || userInput.getPassword2().isEmpty() ) {
 			error = "Please fill in all the fields.";
 			HashMap<String, String> resp = new HashMap<>();
-			resp.put("generalError", error);
+			resp.put("error", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		
 		if(!userInput.password2.equals(userInput.getUser().getPassword())) {
 			error = "Passwords don't match. Try again.";
 			HashMap<String, String> resp = new HashMap<>();
-			resp.put("passwordError", error);
+			resp.put("error", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		
 		if (userRepository.findByEmailIgnoreCase(userInput.getUser().getEmail()) != null) {
 			error = "Email already exists.";
 			HashMap<String, String> resp = new HashMap<>();
-			resp.put("emailError", error);
+			resp.put("error", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		String username = null;
 		if (userRepository.findByUsernameIgnoreCase(username = userInput.getUser().getUsername()) != null) {
 			error = "Username already exists.";
 			HashMap<String, String> resp = new HashMap<>();
-			resp.put("usernameError", error);
+			resp.put("error", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		//Check if any nonAlphanumeric characters exist
 		if(username.matches("^.*[^a-zA-Z0-9 ].*$")) {
 			error = "Usernames may only contain letters, numbers and spaces.";
 			HashMap<String, String> resp = new HashMap<>();
-			resp.put("usernameError", error);
+			resp.put("error", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		

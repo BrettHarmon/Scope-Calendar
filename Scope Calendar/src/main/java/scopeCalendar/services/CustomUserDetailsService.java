@@ -26,11 +26,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username)
       throws UsernameNotFoundException {
   
-        User user = userRepository.findByUsernameIgnoreCase(username);
+        User user = userRepository.findByUsernameOrEmail(username, username);
+        System.out.println(" " + username);
         if (user == null) {
             throw new UsernameNotFoundException(
               "No user found with username: "+ username);
         }
+        System.out.println("it has been found");
         boolean enabled = true;
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;

@@ -8,6 +8,7 @@ var styles = require('./Styles.js');
 import { CreateAccountScreen } from './CreateAccount'
 import { DetailsScreen } from './Index'
 import { LoggedInHome } from './Index'
+import { LoginScreen } from './Login'
 
 
 
@@ -22,11 +23,17 @@ class HomeScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Home Screen</Text>
+        <Text>Welcome to Scope Calendar</Text>
+        <Text>Never miss a date again!</Text>
+        <Text>To get started, sign up below or sign in if you already have an account</Text>
             <Button
               title="Sign Up"
               onPress={() => this.props.navigation.navigate('CreateAccount')}
             />
+          <Button
+              title="Login"
+              onPress={() => this.props.navigation.navigate('Login')}
+          />
       </View>
     );
   }
@@ -46,7 +53,11 @@ const RootStack = StackNavigator(
     },
     Created: {
         screen: LoggedInHome,
-    }
+    },
+    Login: {
+        screen: LoginScreen,
+      }
+
   },
   {
     initialRouteName: 'Home',

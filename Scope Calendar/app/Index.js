@@ -32,7 +32,7 @@ export class LoggedInHome extends React.Component {
 
     return (
       <View style={{ flex: 1}}>
-          <Text style= {{fontSize:20}}> Account Created! Welcome {username}.</Text>
+          <Text style= {{fontSize:20}}> Welcome {username}.</Text>
           <Calendar
           markedDates={{
                 '2018-02-12': {marked: true, dotColor: 'red', activeOpacity: 0}
