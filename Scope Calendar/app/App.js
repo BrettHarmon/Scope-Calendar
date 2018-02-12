@@ -1,17 +1,16 @@
 import React from 'react';
-import { Image,Text,Button,TextInput,TouchableOpacity,View,} from 'react-native';
-import {StackNavigator} from 'react-navigation'; //https://reactnavigation.org/docs
-var styles = require('./Styles.js');
+import { Text,Button,View,AsyncStorage, DeviceEventEmitter} from 'react-native';
+import {StackNavigator} from 'react-navigation'; //https://reactnavigation.org/
+import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+//var styles = require('./Styles.js');
+var Storage = require('./IStorage.js');
 
 //import * as Settings from './Settings.js' //Include on every page
 //import Nav from './Nav'
 import { CreateAccountScreen } from './CreateAccount'
 import { DetailsScreen } from './Index'
 import { LoggedInHome } from './Index'
-
-
-
-
+import { LoginScreen } from './temp'
 
 
 class HomeScreen extends React.Component {
@@ -19,19 +18,81 @@ class HomeScreen extends React.Component {
         title: 'Home',
     };
 
+    constructor(props) {
+        super(props);
+        let info = {};
+        Storage.del('UserInfo');//('UserInfo', (error) => console.log(error));
+        let test = Storage.get('UserInfo');
+        console.log(test);
+         //AsyncStorage.getItem(('UserInfo'), (errors, value) =>{ info = value});
+         //console.log(info);
+         //let obj = JSON.parse(info);
+         //console.log(obj.id);
+         this.state = {
+             id : info.id,
+             username : info.username,
+         };
+         //Create a refresh listener
+         // (HomeScreen shouldn't be constructed more than once)
+         DeviceEventEmitter.addListener('refreshHome', (e)=>{
+             this.buildCookies(this);
+         });
+    }
+
+
+
+     //will rebuild login cookies and refresh homescreen with setState()
+     buildCookies(props){
+        let info = {};
+        AsyncStorage.getItem(('UserInfo'), (errors, value) => {});
+        props.setState({
+            id : info.id,
+            username : info.username,
+        });
+         console.log('Refreshing homepage...', props.state.id);
+     }
+
   render() {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Home Screen</Text>
-            <Button
-              title="Sign Up"
-              onPress={() => this.props.navigation.navigate('CreateAccount')}
-            />
-      </View>
+        <View style={{ flex: 1}}>
+        {this.HomeGreeting()}
+
+        <Button
+          title="Sign Up"
+          onPress={() => this.props.navigation.navigate('Login')}
+        />
+
+        </View>
     );
   }
-}
 
+
+    //Decides if a user is logged in or not
+    HomeGreeting() {
+        var that = this;
+        if(!this.state.username){
+            //Try one more time to get UserInfo
+            //AsyncStorage.getItem(('UserInfo'), (errors, value) => {that.setState({userInfo : value}));
+        }
+        console.log(this.state.username);
+        if(!!this.state.username){
+            console.log("logged in")
+            //Logged in
+            return(<LoggedInHome/>);
+        }
+        else{
+            console.log("not logged in")
+            return(
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <Button
+                      title="Sign Up"
+                      onPress={() => this.props.navigation.navigate('CreateAccount')}
+                    />
+                </View>
+            );
+        }
+    }
+}
 
 const RootStack = StackNavigator(
   {
@@ -46,6 +107,9 @@ const RootStack = StackNavigator(
     },
     Created: {
         screen: LoggedInHome,
+    },
+    Login: {
+        screen: LoginScreen,
     }
   },
   {
@@ -64,112 +128,3 @@ const RootStack = StackNavigator(
 );
 
 export default RootStack;
-
-/*export default class App extends React.Component {
-  render() {
-    return <RootStack />;
-  }
-}*/
-
-
-
-
-
-
-
-
-/*export default class App extends React.Component {
-    constructor(props){
-        super(props)
-    }
-    render(){
-        <Home></Home>
-    }
-}*/
-
-/*class HomeScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Welcome',
-  };
-  render() {
-    const { navigate } = this.props.navigation;
-    return (
-      <Button
-        title="Go to Jane's profile"
-        onPress={() =>
-          navigate('Profile', { name: 'Jane' })
-        }
-      />
-    );
-  }
-}*/
-
-    /*renderScene(route, navigator) {
-      var {state,actions} = this.props;
-      var routeId = route.id;
-      //every view gets an route name (might want to great ENUM list)
-      if (routeId === 'home') {
-        return (
-          <Home
-          {...this.props}
-          userData ={route.userData}
-          navigator={navigator}
-          />
-          );
-      }
-      /*if (routeId === 'signup') {
-        return (
-          <Messages
-          {...this.props}
-          userData ={route.userData}
-          navigator={navigator} />
-          );
-      }*/
-
-
-
-    /*render() {
-        return (
-          <View style={{flex:1}}>
-               <Navigator
-               style={{flex: 1}}
-               ref={'NAV'}
-               initialRoute={{id: 'home', name: 'home'}}
-               renderScene={this.renderScene.bind(this)}/>
-           </View>
-          )
-      }*/
-
-
-
-    /*
-    constructor(props) {
-        super(props);
-        this.state = {userId: ''};
-        this.userLoggedIn = this.userLoggedIn.bind(this);
-    }
-
-    userLoggedIn(userId) {
-        this.setState({userId: userId});
-    }
-  render() {
-        if (this.state.userId == '') {
-    return (
-      <View>
-        <Text>Welcome to Scope Calendar</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <LoginBox loggedIn={this.userLoggedIn}></LoginBox>
-          <Text> {this.state.userId} </Text>
-      </View>
-    ); }
-    else {
-            return (
-                <View>
-                    <Text>Welcome to Scope Calendar</Text>
-                    <Text>You have been logged in</Text>
-                    <Text> Welcome {this.state.userId.username}! </Text>
-                </View>
-            );
-        }
-  }
-  */

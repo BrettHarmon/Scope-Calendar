@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import {StackNavigator} from 'react-navigation';
 
 import * as Settings from './Settings.js' //Include on every page
@@ -77,14 +77,18 @@ class LoginBox extends React.Component {
             }
             else{
                 response.json().then(function (json) {
-                    console.log(JSON.stringify(json));
-                    that.setState(function(previousState) {
-                        //TODO make this is use cookies
-                        return {userId : json.userId, username: json.username}
-                    });
-                    console.log(that.state.userId);
-                    //that.props.loggedIn(json);
-                    that.props.navigation.navigate('Created', {username: that.state.username})
+
+                    //Cookie to perserve authenticted user
+                    let user = {
+                            id: json.userId,
+                            username: json.username,
+                            ROLE_LIST: json.role
+                    };
+                    
+                    AsyncStorage.setItem('UserInfo', JSON.stringify(user));
+
+                    DeviceEventEmitter.emit('refreshHome',  {});
+                    that.props.navigation.popToTop(); //go back to start
 
                 });
             }
@@ -143,8 +147,6 @@ class LoginBox extends React.Component {
                 </View>
 
             <Button title="Create Account" onPress={this.createAccount.bind(this)} />
-
-
 
             </View>
         )

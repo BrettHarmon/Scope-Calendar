@@ -4,6 +4,7 @@ package scopeCalendar.controllers;
 import java.net.URI;
 import java.util.HashMap;
 
+import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonObjectSerializer;
 import org.springframework.http.HttpHeaders;
@@ -17,12 +18,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import scopeCalendar.models.CompoundModels.CreateAccountCM;
+import scopeCalendar.models.CompoundModels.*;
 import scopeCalendar.models.User;
 import scopeCalendar.repos.UserRepository;
 import scopeCalendar.services.IUserService;
@@ -36,7 +39,6 @@ public class UserController {
 	
 	@Autowired
 	private IUserService userService;
-	
 	
 	@PostMapping(value = {"/signup"}, produces = "application/json")
 	@ResponseBody
@@ -62,9 +64,9 @@ public class UserController {
 			resp.put("usernameError", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
-		//Check if any nonAlphanumeric characters exist
-		if(username.matches("^.*[^a-zA-Z0-9 ].*$")) {
-			error = "Usernames may only contain letters, numbers and spaces.";
+		//Check username matches username rules
+		if(username.matches("^.*[^a-zA-Z0-9-_].*$")) {
+			error = "Usernames may only contain dashes \"-\", underscores \"_\", letters and numbers.";
 			HashMap<String, String> resp = new HashMap<>();
 			resp.put("usernameError", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
@@ -73,13 +75,14 @@ public class UserController {
 		// -- Email errors
 		String email = null;
 		if (userRepository.findByEmailIgnoreCase(email = userInput.getUser().getEmail()) != null) {
-			error = "Email already exists.";
+			error = "E-mail already exists.";
 			HashMap<String, String> resp = new HashMap<>();
 			resp.put("emailError", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
-		if(!email.contains("@")) {
-			error = "Enter valid Email address.";
+		EmailValidator em = new EmailValidator();
+		if(!em.isValid(email, null ) ) {
+			error = "Enter valid e-mail address.";
 			HashMap<String, String> resp = new HashMap<>();
 			resp.put("emailError", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
@@ -95,7 +98,7 @@ public class UserController {
 		
 		User user = new User();
 		user.setEmail(userInput.getUser().getEmail().trim());
-		user.setPassword(userInput.getUser().getPassword().trim());
+		user.setPassword(userInput.getUser().getPassword());
 		user.setUsername(userInput.getUser().getUsername().trim());
 		
 		try {
@@ -109,6 +112,18 @@ public class UserController {
 		}
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(user);
+	}
+	
+	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<?> Login( UriComponentsBuilder ucb, 
+									Model model)  {
+		String s = "Dopeeee";
+		HashMap<String, String> resp = new HashMap<>();
+		//resp.put(user, pass);
+		//return new  ResponseEntity<>(resp, HttpStatus.OK); 
+	
+		return ResponseEntity.status(HttpStatus.CREATED).body(s);
 	}
 	
 	@GetMapping({"/test"})

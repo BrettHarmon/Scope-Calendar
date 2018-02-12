@@ -4,7 +4,7 @@
 // Appearence of navigator is located in the Nav.js
 */
 import React from 'react';
-import {Button, Text, View} from 'react-native';
+import {Button, Text, View, AsyncStorage} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
 export class DetailsScreen extends React.Component {
@@ -23,16 +23,22 @@ export class DetailsScreen extends React.Component {
 
 //This is temporary
 export class LoggedInHome extends React.Component {
+    constructor(props){
+        super(props);
+        let info = {};
+         AsyncStorage.getItem(('UserInfo'), (errors, value) => {info = value});
+         this.state = {
+             id : info.id,
+             username : info.username,
+         };
+    }
     static navigationOptions = {
         title: 'Home'
     }
   render() {
-      const { params } = this.props.navigation.state;
-      let username = (params ? params.username : null) || "User";
-
     return (
       <View style={{ flex: 1}}>
-          <Text style= {{fontSize:20}}> Account Created! Welcome {username}.</Text>
+          <Text style= {{fontSize:20, textAlign: 'center'}}> Welcome {this.state.username}!</Text>
           <Calendar
           markedDates={{
                 '2018-02-12': {marked: true, dotColor: 'red', activeOpacity: 0}
@@ -40,7 +46,7 @@ export class LoggedInHome extends React.Component {
             style={{
               borderWidth: 1,
               borderColor: 'gray',
-              height: 350
+              height: 350,
             }}
             theme={{
                 backgroundColor: '#ffffff',
