@@ -25,12 +25,6 @@ export class DetailsScreen extends React.Component {
 export class LoggedInHome extends React.Component {
     constructor(props){
         super(props);
-        let info = {};
-         AsyncStorage.getItem(('UserInfo'), (errors, value) => {info = value});
-         this.state = {
-             id : info.id,
-             username : info.username,
-         };
     }
     static navigationOptions = {
         title: 'Home'
@@ -38,7 +32,7 @@ export class LoggedInHome extends React.Component {
   render() {
     return (
       <View style={{ flex: 1}}>
-          <Text style= {{fontSize:20, textAlign: 'center'}}> Welcome {this.state.username}!</Text>
+          <Text style= {{fontSize:20, textAlign: 'center'}}> Welcome {this.props.username}!</Text>
           <Calendar
           markedDates={{
                 '2018-02-12': {marked: true, dotColor: 'red', activeOpacity: 0}
@@ -46,7 +40,7 @@ export class LoggedInHome extends React.Component {
             style={{
               borderWidth: 1,
               borderColor: 'gray',
-              height: 350,
+              height: 350
             }}
             theme={{
                 backgroundColor: '#ffffff',

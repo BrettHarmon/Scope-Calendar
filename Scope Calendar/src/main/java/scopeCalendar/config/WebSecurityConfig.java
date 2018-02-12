@@ -7,10 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import scopeCalendar.services.CustomUserDetailsService;
 
@@ -27,6 +29,15 @@ import scopeCalendar.services.CustomUserDetailsService;
 		public PasswordEncoder encoder() {
 		    return new BCryptPasswordEncoder();
 		}
+		
+		@Bean
+		public CommonsRequestLoggingFilter requestLoggingFilter() {
+		    CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
+		    loggingFilter.setIncludeClientInfo(true);
+		    loggingFilter.setIncludeQueryString(true);
+		    loggingFilter.setIncludePayload(true);
+		    return loggingFilter;
+		}
 
 		
 		@Bean
@@ -38,24 +49,29 @@ import scopeCalendar.services.CustomUserDetailsService;
 		    return authProvider;
 		}
 		
+		   @Override
+		    public void configure(WebSecurity web) throws Exception {
+		        web.debug(true);
+		    }
+		   
 		@Override
 	    protected void configure(HttpSecurity http) throws Exception {
 	        http
 	            .authorizeRequests()
-	                .antMatchers("/", "/home", "/signup").permitAll()
+	                .antMatchers("/", "/signup", "/login").permitAll()
 	                .antMatchers("/test").authenticated()
 	                .and()
 	            .formLogin()
-	                .loginPage("/login").permitAll()
-	                .defaultSuccessUrl("/")
-	                .failureUrl("/login?error=true")
-	                .usernameParameter("username")
+	                .loginPage("/signin").loginProcessingUrl("/signin").permitAll()
+	                .defaultSuccessUrl("/test")
+	                .failureUrl("/fail")
+	                .usernameParameter("email")
 	                .passwordParameter("password")
 	                .and()
+	                .httpBasic().and().csrf().disable()
 	            .logout()
 	                .permitAll();
-	        
-	        http.csrf().disable();
+	   
 	    }
 		
 		@Override

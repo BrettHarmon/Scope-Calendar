@@ -2,6 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import {StackNavigator} from 'react-navigation';
+import * as Keychain from 'react-native-keychain';
 
 import * as Settings from './Settings.js' //Include on every page
 import Nav from './Nav'
@@ -79,15 +80,16 @@ class LoginBox extends React.Component {
                 response.json().then(function (json) {
 
                     //Cookie to perserve authenticted user
-                    let user = {
+                    /*let user = {
                             id: json.userId,
                             username: json.username,
                             ROLE_LIST: json.role
                     };
-                    
-                    AsyncStorage.setItem('UserInfo', JSON.stringify(user));
 
-                    DeviceEventEmitter.emit('refreshHome',  {});
+                    AsyncStorage.setItem('UserInfo', JSON.stringify(user));
+*/
+                    //Keychain.setGenericPassword(json.username, "password");
+                    DeviceEventEmitter.emit('refreshHome',  json.username);
                     that.props.navigation.popToTop(); //go back to start
 
                 });

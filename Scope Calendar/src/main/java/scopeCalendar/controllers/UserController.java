@@ -114,7 +114,7 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(user);
 	}
 	
-	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
+	/*@RequestMapping(value = {"/signin"}, method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<?> Login( UriComponentsBuilder ucb, 
 									Model model)  {
@@ -124,16 +124,16 @@ public class UserController {
 		//return new  ResponseEntity<>(resp, HttpStatus.OK); 
 	
 		return ResponseEntity.status(HttpStatus.CREATED).body(s);
-	}
+	}*/
 	
 	@GetMapping({"/test"})
 	@ResponseBody
-	public User test() {
+	public Object test() {
 		
 		System.out.println("HELLO ANDROID");
 		User user = new User();
 		user.setEmail("email@email.com");
-		return user;
+		return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		
 	}
