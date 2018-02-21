@@ -33,6 +33,10 @@ export class LoggedInHome extends React.Component {
     return (
       <View style={{ flex: 1}}>
           <Text style= {{fontSize:20, textAlign: 'center'}}> Welcome {this.props.username}!</Text>
+          <Button
+              title="Create Organization"
+              onPress={() => this.props.navigation.navigate('CreateOrganization')}
+          />
           <Calendar
           markedDates={{
                 '2018-02-12': {marked: true, dotColor: 'red', activeOpacity: 0}

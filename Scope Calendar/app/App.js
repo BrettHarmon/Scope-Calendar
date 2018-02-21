@@ -12,6 +12,7 @@ import { CreateAccountScreen } from './CreateAccount'
 import { DetailsScreen } from './Index'
 import { LoggedInHome } from './Index'
 import { LoginScreen } from './Login'
+import {CreateOrganizationScreen} from "./CreateOrganization";
 
 
 class HomeScreen extends React.Component {
@@ -22,12 +23,14 @@ class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
         username = '';
+        userId = '';
          //AsyncStorage.getItem(('UserInfo'), (errors, value) =>{ info = value});
          //console.log(info);
          //let obj = JSON.parse(info);
          //console.log(obj.id);
          this.state = {
              username : username,
+             userId   : userId,
          };
          //Create a refresh listener
          // (HomeScreen shouldn't be constructed more than once)
@@ -94,7 +97,7 @@ class HomeScreen extends React.Component {
         if(!!this.state.username){
             console.log("logged in")
             //Logged in
-            return(<LoggedInHome username={this.state.username}/>);
+            return(<LoggedInHome navigation={this.props.navigation} username={this.state.username} userId={this.state.userId}/>);
         }
         else{
             console.log("not logged in")
@@ -136,7 +139,10 @@ const RootStack = StackNavigator(
     },
     Login: {
         screen: LoginScreen,
-      }
+      },
+    CreateOrganization: {
+        screen: CreateOrganizationScreen,
+    }
 
   },
   {

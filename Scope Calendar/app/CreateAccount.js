@@ -89,7 +89,7 @@ class LoginBox extends React.Component {
                     AsyncStorage.setItem('UserInfo', JSON.stringify(user));
 */
                     //Keychain.setGenericPassword(json.username, "password");
-                    DeviceEventEmitter.emit('refreshHome',  json.username);
+                    DeviceEventEmitter.emit('refreshHome',  json.username, json.userId);
                     that.props.navigation.popToTop(); //go back to start
 
                 });
