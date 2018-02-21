@@ -6,4 +6,5 @@ import scopeCalendar.models.Organization;
 
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
 	Organization findByName(String one);
+	Organization findByOrganizationId(long arg);
 }

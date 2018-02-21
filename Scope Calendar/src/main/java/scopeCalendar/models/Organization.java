@@ -2,19 +2,15 @@ package scopeCalendar.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "organizations")
 public class Organization implements Serializable {
-
-
 	private static final long serialVersionUID = -5513950805803868005L;
 	
 	@Id
@@ -22,16 +18,23 @@ public class Organization implements Serializable {
 	@Column(name = "organizationId")
 	private long organizationId;
 	
-	
 	@Column(name = "name")
+	@NotEmpty(message = "*An organization must be called something.")
 	private String name;
 	
-	@Column(name = "ownerId")
-	private long ownerId;
+	@Column(columnDefinition="TEXT") //supports longer length DB entries
+	private String description;
 	
-	@Column(name = "users")
-	private ArrayList<User> users;
-
+	@ManyToOne(optional = false)
+	@JoinColumn(name="ownerId", nullable=false)
+	private User owner;
+	
+	@ManyToMany(mappedBy = "subscribedOrganizations") //Junction table created on user.subscribedOrganizations 
+	private Set<User> users;
+	
+	@OneToMany(mappedBy = "organization")
+	private Set<Event> events;
+	
 	public long getOrganizationId() {
 		return organizationId;
 	}
@@ -48,20 +51,36 @@ public class Organization implements Serializable {
 		this.name = name;
 	}
 
-	public long getOwnerId() {
-		return ownerId;
+	public User getOwner() {
+		return owner;
 	}
 
-	public void setOwnerId(long ownerId) {
-		this.ownerId = ownerId;
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
-	public ArrayList<User> getUsers() {
+	public Set<User> getUsers() {
 		return users;
 	}
 
-	public void setUsers(ArrayList<User> users) {
+	public void setUsers(Set<User> users) {
 		this.users = users;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Set<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(Set<Event> events) {
+		this.events = events;
 	}
 
 }

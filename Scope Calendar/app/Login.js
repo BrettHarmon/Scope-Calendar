@@ -27,13 +27,12 @@ class LoginBox extends React.Component {
         super(props);
         this.state = {
             password : '',
-            email : '',
-            username : '',
+            identity : '',
             error: ''};
     }
 
     login(event) {
-        var email = this.state.email;
+        var identity = this.state.identity;
         var password = this.state.password;
         var that = this;
 
@@ -48,7 +47,7 @@ class LoginBox extends React.Component {
                     "Content-type": "application/x-www-form-urlencoded",
                 },
                 body: querystring.stringify({
-                    email: email,
+                    identity: identity,
                     password: password,
                 })
             })
@@ -67,8 +66,9 @@ class LoginBox extends React.Component {
                     that.props.navigation.popToTop(); //go back to start
                 })
             })
-            .catch((error) => {
-                console.error(error);
+            .catch((err) => {
+                that.setState({error: err});
+                console.error(err);
             })
         );
     }
@@ -77,13 +77,13 @@ class LoginBox extends React.Component {
     render() {
         return (
             <View style={styles.bodyView}>
-                <Text style={{color: "#d10000", textAlign: 'center'}}>{this.state.generalErr}</Text>
+                <Text style={{color: "#d10000", textAlign: 'center'}}>{this.state.error}</Text>
                 <View style= {styles.InputSpan}>
                     <Text style= {styles.TInputLabel}>Username or Email</Text>
                     <TextInput
                         style = {styles.TInput}
-                        onChangeText={(email) => this.setState({email})}
-                        value={this.state.email}
+                        onChangeText={(identity) => this.setState({identity})}
+                        value={this.state.identity}
                     />
                 </View>
 

@@ -2,7 +2,13 @@ package scopeCalendar.controllers;
 
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.validation.Valid;
 
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +16,16 @@ import org.springframework.boot.jackson.JsonObjectSerializer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +40,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import scopeCalendar.models.CompoundModels.*;
 import scopeCalendar.models.User;
 import scopeCalendar.repos.UserRepository;
+import scopeCalendar.services.CustomUserDetailsService;
 import scopeCalendar.services.IUserService;
 
 
@@ -42,8 +55,25 @@ public class UserController {
 	
 	@PostMapping(value = {"/signup"}, produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<?> createAccount(@RequestBody CreateAccountCM userInput, UriComponentsBuilder ucb, 
+	public ResponseEntity<?> createAccount(@RequestBody @Valid CreateAccountCM userInput, BindingResult bindingResult, 
 									Model model)  {
+		
+		HashMap<String, String> resp = new HashMap<>(); //Password errors are: generalError, usernameError, emailError, passwordError
+		
+		//Parse through errors directed from field annotations (requirements eg: notEmpty) 
+		if (bindingResult.hasErrors()) {
+			for( FieldError error : bindingResult.getFieldErrors()) {
+				if(error.getField().equalsIgnoreCase( "user.username")) {
+					resp.put("usernameError", error.getDefaultMessage());
+				}
+				else if(error.getField().equalsIgnoreCase( "user.email")) {
+					resp.put("emailError", error.getDefaultMessage());
+				}
+				else if(error.getField().equalsIgnoreCase( "user.password")) {
+					resp.put("passwordError", error.getDefaultMessage());
+				}
+			}
+		}
 		
 		String error = "";
 		
@@ -51,50 +81,33 @@ public class UserController {
 		if (userInput.getUser().getEmail().trim().isEmpty() || userInput.getUser().getPassword().trim().isEmpty()
 				|| userInput.getUser().getUsername().trim().isEmpty() || userInput.getPassword2().isEmpty() ) {
 			error = "Please fill in all the fields.";
-			HashMap<String, String> resp = new HashMap<>();
 			resp.put("generalError", error);
-			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		
 		// -- Username errors
 		String username = null;
 		if (userRepository.findByUsernameIgnoreCase(username = userInput.getUser().getUsername()) != null) {
 			error = "Username already exists.";
-			HashMap<String, String> resp = new HashMap<>();
 			resp.put("usernameError", error);
-			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
-		}
-		//Check username matches username rules
-		if(username.matches("^.*[^a-zA-Z0-9-_].*$")) {
-			error = "Usernames may only contain dashes \"-\", underscores \"_\", letters and numbers.";
-			HashMap<String, String> resp = new HashMap<>();
-			resp.put("usernameError", error);
-			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		
+		
 		// -- Email errors
-		String email = null;
-		if (userRepository.findByEmailIgnoreCase(email = userInput.getUser().getEmail()) != null) {
+		if (userRepository.findByEmailIgnoreCase(userInput.getUser().getEmail()) != null) {
 			error = "E-mail already exists.";
-			HashMap<String, String> resp = new HashMap<>();
 			resp.put("emailError", error);
-			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
-		EmailValidator em = new EmailValidator();
-		if(!em.isValid(email, null ) ) {
-			error = "Enter valid e-mail address.";
-			HashMap<String, String> resp = new HashMap<>();
-			resp.put("emailError", error);
-			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
-		}
-
+		
 		// -- Password Errors
 		if(!userInput.password2.equals(userInput.getUser().getPassword())) {
 			error = "Passwords don't match. Try again.";
-			HashMap<String, String> resp = new HashMap<>();
 			resp.put("passwordError", error);
+		}
+		
+		if(!resp.isEmpty()) {
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
+		
 		
 		User user = new User();
 		user.setEmail(userInput.getUser().getEmail().trim());
@@ -106,34 +119,36 @@ public class UserController {
 		}catch (Exception e) {
 			error = "There was a problem creating your account. Please try again.";
 			System.out.println(e);
-			HashMap<String, String> resp = new HashMap<>();
 			resp.put("generalError", error);
 			return new  ResponseEntity<>(resp, HttpStatus.BAD_REQUEST); 
 		}
 		
+		//Automatically log in user upon creation
+		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+				user, null, new ArrayList<SimpleGrantedAuthority>(Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")))));
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(user);
 	}
 	
-	/*@RequestMapping(value = {"/signin"}, method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<?> Login( UriComponentsBuilder ucb, 
-									Model model)  {
-		String s = "Dopeeee";
-		HashMap<String, String> resp = new HashMap<>();
-		//resp.put(user, pass);
-		//return new  ResponseEntity<>(resp, HttpStatus.OK); 
 	
-		return ResponseEntity.status(HttpStatus.CREATED).body(s);
-	}*/
+	@GetMapping(value ={"/LoginAuth"}, produces = "application/json")
+	@ResponseBody
+	public Object UserInfo() {
+		
+		System.out.println("User info requested.");
+		return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		
+	}
 	
 	@GetMapping({"/test"})
 	@ResponseBody
-	public Object test() {
+	public ResponseEntity<?> test() {
 		
 		System.out.println("HELLO ANDROID");
 		User user = new User();
 		user.setEmail("email@email.com");
-		return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return ResponseEntity.status(HttpStatus.CREATED).body(user);
 		
 		
 	}

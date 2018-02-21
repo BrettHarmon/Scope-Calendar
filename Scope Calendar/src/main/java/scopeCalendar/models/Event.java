@@ -3,10 +3,10 @@ package scopeCalendar.models;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+
+import org.hibernate.annotations.Target;
+
+import javax.persistence.*;
 import java.util.Date;
 
 
@@ -24,14 +24,12 @@ public class Event implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition="TEXT")
     private String description;
 
-    @Column(name = "organizationId")
-    private long organizationId;
-
-    @Column(name = "creatorId")
-    private long creatorId ;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="organizationId", nullable=false)
+	private Organization organization;
 
     @Column(name = "startDate")
     private Date start;
@@ -63,20 +61,12 @@ public class Event implements Serializable {
         this.description = description;
     }
 
-    public long getOrganization() {
-        return organizationId;
+    public Organization getOrganization() {
+        return organization;
     }
 
     public void setOrganization(Organization org) {
-        this.organizationId = org.getOrganizationId();
-    }
-
-    public long getCreator() {
-        return creatorId;
-    }
-
-    public void setCreator(User user) {
-        this.creatorId = user.getUserId() ;
+        this.organization = org;
     }
 
     public Date getStartDate() {

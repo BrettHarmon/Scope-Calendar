@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
+import scopeCalendar.Application;
 import scopeCalendar.services.CustomUserDetailsService;
 
 
@@ -59,18 +60,22 @@ import scopeCalendar.services.CustomUserDetailsService;
 	        http
 	            .authorizeRequests()
 	                .antMatchers("/", "/signup", "/login").permitAll()
-	                .antMatchers("/test").authenticated()
+	                .anyRequest().authenticated()
 	                .and()
 	            .formLogin()
 	                .loginPage("/signin").loginProcessingUrl("/signin").permitAll()
-	                .defaultSuccessUrl("/test")
+	                .defaultSuccessUrl("/LoginAuth")
 	                .failureUrl("/fail")
-	                .usernameParameter("email")
+	                .usernameParameter("identity")
 	                .passwordParameter("password")
 	                .and()
 	                .httpBasic().and().csrf().disable()
 	            .logout()
 	                .permitAll();
+	        
+	        if(Application.DEBUG_MODE) {
+	        	http.authorizeRequests().anyRequest().permitAll();
+	        }
 	   
 	    }
 		

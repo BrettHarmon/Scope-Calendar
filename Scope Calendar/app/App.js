@@ -6,8 +6,8 @@ import * as Keychain from 'react-native-keychain';
 //var styles = require('./Styles.js');
 var Storage = require('./IStorage.js');
 
-//import * as Settings from './Settings.js' //Include on every page
-//import Nav from './Nav'
+
+import * as Settings from './Settings.js' //Include on every page
 import { CreateAccountScreen } from './CreateAccount'
 import { DetailsScreen } from './Index'
 import { LoggedInHome } from './Index'
@@ -53,6 +53,26 @@ class HomeScreen extends React.Component {
          console.log('Refreshing homepage...', props);
      }
 
+     testLoggedin(){
+         fetch( Settings.HOME_URL + '/LoginAuth', {
+
+             method: 'GET',
+             headers: {
+                 'Accept': 'application/json',
+                "Content-type": "application/x-www-form-urlencoded",
+             },
+         })
+         .then((response) => {
+             response.json().then(function (json) {
+                 //Executes only with authenticated user
+                 console.log('authentication ', json);
+             }).catch((error) => {
+                 console.log('User is not logged in.');
+             })
+         })
+
+     }
+
   render() {
     return (
         <View style={{ flex: 1}}>
@@ -89,6 +109,11 @@ class HomeScreen extends React.Component {
               			title="Login"
               			onPress={() => this.props.navigation.navigate('Login')}
          			 />
+
+                     <Button
+               			title="Test Login"
+               			onPress={() => this.testLoggedin()}
+          			 />
                 </View>
             );
         }

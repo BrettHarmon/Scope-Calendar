@@ -1,8 +1,12 @@
 package scopeCalendar.models;
+
+import javax.validation.Valid;
+
 //Here are wrappers for complex View Models and Compound Request models
 public class CompoundModels {
 	
 	public static class CreateAccountCM {
+		@Valid
 		public User user;
 		public String password2;
 		public User getUser() {
@@ -20,22 +24,4 @@ public class CompoundModels {
 		
 	}
 	
-	public static class BasicUser {
-		public String user;
-		public String password;
-		public String getUser() {
-			return user;
-		}
-		public String getPassword() {
-			return password;
-		}
-		public void setUser(String user) {
-			this.user = user;
-		}
-		public void setPassword(String password) {
-			this.password = password;
-		}
-		
-	}
-
 }

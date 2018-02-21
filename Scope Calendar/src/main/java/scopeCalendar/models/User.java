@@ -4,14 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+import javax.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Transient;
@@ -22,21 +20,41 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 3832260458606639106L;
 	@Column(name = "password")
 	@Length(min = 5, message = "*Your password must have at least 5 characters")
-	@NotEmpty(message = "*Please provide your password")
+	@NotEmpty(message = "*Please provide a password")
 	@Transient
 	private String password;
+	
+	
 	@Column(name = "email")
-	@NotEmpty(message = "*Enter a email address")
+	@NotEmpty(message = "*Enter an email address.")
+	@Email(message = "*Enter a valid email address.")
 	private String email;
 	
 	@Column(name = "username")
+	@Pattern(regexp = "^[a-zA-Z0-9-_]*$", message = "Usernames may only contain dashes \\\"-\\\", underscores \\\"_\\\", letters and numbers." )
 	@NotEmpty(message = "*Enter a username")
 	private String username;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "userid")
+	@Column(name = "userId")
 	private long userId;
+	
+	@ManyToMany(targetEntity=Organization.class, cascade=CascadeType.ALL)
+    @JoinTable(
+          name="user_organization_junction",
+          joinColumns=@JoinColumn(name="userId"),
+          inverseJoinColumns=@JoinColumn(name="organizationId")
+        )
+	private Set<Organization> subscribedOrganizations;
+	
+	@Transient
+	@OneToMany(mappedBy="owner")
+    private Set<Organization> orgs;
+    
+	public Set<Organization> getOwnedOrganizations() {
+		return orgs;
+	}
 	
 	
 	public User(){
@@ -78,5 +96,13 @@ public class User implements Serializable {
 	
 	public List<String> getRole() {
 		return Arrays.asList("ROLE_USER");
+	}
+
+	public Set<Organization> getSubscribedOrganizations() {
+		return subscribedOrganizations;
+	}
+
+	public void setSubscribedOrganizations(Set<Organization> subscribedOrganizations) {
+		this.subscribedOrganizations = subscribedOrganizations;
 	}
 }
