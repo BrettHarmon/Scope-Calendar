@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Target;
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -32,10 +34,12 @@ public class Event implements Serializable {
 	private Organization organization;
 
     @Column(name = "startDate")
-    private Date start;
+    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime start;
 
     @Column(name = "endDate")
-    private Date end;
+    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    private DateTime end;
 
     public long getEventId() {
         return eventId;
@@ -69,19 +73,19 @@ public class Event implements Serializable {
         this.organization = org;
     }
 
-    public Date getStartDate() {
+    public DateTime getStartDate() {
         return start;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(DateTime startDate) {
         this.start = startDate;
     }
 
-    public Date getStateDate() {
+    public DateTime getStateDate() {
         return end;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(DateTime endDate) {
         this.end = endDate;
     }
 }

@@ -1,8 +1,10 @@
 import React from 'react';
-import { Image,Text,Button,TextInput, TouchableOpacity, View,AsyncStorage, DeviceEventEmitter} from 'react-native';
-import {StackNavigator} from 'react-navigation'; //https://reactnavigation.org/
+import { Image,Text,Dimensions,Button,TextInput, TouchableOpacity, View,AsyncStorage, DeviceEventEmitter,ScrollView} from 'react-native';
+import {StackNavigator, DrawerNavigator, DrawerItems, SafeAreaView } from 'react-navigation'; //https://reactnavigation.org/docs/api-reference.html
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import * as Keychain from 'react-native-keychain';
+//import Iconz from 'react-native-vector-icons/MaterialIcons'; //https://material.io/icons/
+import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
 //var styles = require('./Styles.js');
 var Storage = require('./IStorage.js');
 
@@ -14,10 +16,44 @@ import { LoggedInHome } from './Index'
 import { LoginScreen } from './Login'
 
 
+
+
+
+/*
+const DrawerNavigation = StackNavigator({
+  DrawerStack: { screen: DrawerStack }
+}, {
+  headerMode: 'float',
+  navigationOptions: ({navigation}) => ({
+    headerStyle: {backgroundColor: 'green'},
+    title: 'Logged In to your app!',
+    headerLeft: <Text onPress={() => navigation.navigate('DrawerStack')}>Menu</Text>
+  })
+})
+*/
+
+
+class HomeHeader extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+  render() {
+    return (
+        <View style={{flexWrap: 'wrap',alignItems: 'flex-start',flexDirection:'row', justifyContent: 'center',alignItems: 'center', margin:10}}>
+           <Text style={{paddingLeft:35,fontWeight: 'bold', color: '#fff', fontSize:22}}>Home</Text>
+       </View>
+    );
+  }
+}
+
 class HomeScreen extends React.Component {
-    static navigationOptions = {
-        title: 'Home',
-    };
+    static navigationOptions = ({navigation}) => ({
+        drawerLabel: () => null,
+        headerTitle: <HomeHeader />,
+        headerLeft: (
+            <Iconz name="md-menu" color ="#fff" size={28} style={{marginLeft: 10}} onPress={() => navigation.navigate('DrawerToggle')}/>
+        )
+    });
 
     constructor(props) {
         super(props);
@@ -111,14 +147,17 @@ class HomeScreen extends React.Component {
          			 />
 
                      <Button
-               			title="Test Login"
-               			onPress={() => this.testLoggedin()}
-          			 />
+                           title="Random button"
+                           onPress={() => alert(Dimensions.get('window').width )}
+                    />
+
                 </View>
             );
         }
     }
 }
+
+
 
 const RootStack = StackNavigator(
   {
@@ -136,15 +175,16 @@ const RootStack = StackNavigator(
     },
     Login: {
         screen: LoginScreen,
-      }
+    },
+    //drawerStack: { screen: DrawerStack }
+
 
   },
   {
     initialRouteName: 'Home',
-    //initialRouteName: 'Created', //TODO delete me
     navigationOptions: {
      headerStyle: {
-       backgroundColor: '#f4511e',
+       backgroundColor: '#6b52ae',
      },
      headerTintColor: '#fff',
      headerTitleStyle: {
@@ -154,4 +194,17 @@ const RootStack = StackNavigator(
   }
 );
 
-export default RootStack;
+// slideable sidebar
+const Drawer = DrawerNavigator({
+    Stack: {
+      screen: RootStack,
+    },
+    //CreateAccount: {
+    //    screen: CreateAccountScreen,
+    //},
+},
+{
+  drawerWidth: () =>  {return (Dimensions.get('window').width * .75)}
+})
+
+export default Drawer;
