@@ -23,6 +23,7 @@ import scopeCalendar.repos.OrganizationRepository;
 import scopeCalendar.repos.UserRepository;
 
 @Controller
+@RequestMapping("/organization/*")
 public class OrganizationController {
 	
 	@Autowired
@@ -32,7 +33,7 @@ public class OrganizationController {
 	OrganizationRepository organizationRepository;
 	
 
-	@PostMapping(value = {"/organization/create"}, produces = "application/json")
+	@PostMapping(value = {"create"}, produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<?> createOrganization(@RequestBody Organization userInput, UriComponentsBuilder ucb, 
 									Model model) {
@@ -49,14 +50,29 @@ public class OrganizationController {
 		
 	}
 	
+	@PostMapping(value = {"info"}, produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> OrganizationProfile(@RequestBody long OrganizationId, UriComponentsBuilder ucb, 
+									Model model) {
+		String error = "";
+		Organization org = organizationRepository.getOne(OrganizationId);
+
+		//TODO: compile upcomingEvents object
+		return ResponseEntity.status(HttpStatus.OK).body(org);
+		
+		
+	}
 	
-	@RequestMapping( value = {"/organization/test"}, method ={RequestMethod.GET, RequestMethod.POST} )
-	public void organizationTest() {
+	
+	
+	@RequestMapping( value = {"test"}, method ={RequestMethod.GET, RequestMethod.POST} )
+	public ResponseEntity<?>  organizationTest() {
 		long orgId = 1;
 		Set<Event> evts = null;
 		Organization org = organizationRepository.findByOrganizationId(orgId);
 		evts = org.getEvents();
 		User user = org.getOwner();
+		return ResponseEntity.status(HttpStatus.OK).body("");
 
 	}
 }

@@ -7,9 +7,12 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Target;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 
 @Entity
@@ -40,6 +43,14 @@ public class Event implements Serializable {
     @Column(name = "endDate")
     @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
     private DateTime end;
+    
+    @Column(name = "TimeZoneOffset")
+    private int timezoneOffset;
+    
+    public Event() {
+    	setTimezoneOffset();
+    }
+    
 
     public long getEventId() {
         return eventId;
@@ -88,6 +99,30 @@ public class Event implements Serializable {
     public void setEndDate(DateTime endDate) {
         this.end = endDate;
     }
+    public Interval getTimeInterval() {
+    	return new Interval(start,end);
+    }
+
+	public int getTimezoneOffset() {
+		return timezoneOffset;
+	}
+
+	public void setTimezoneOffset(int timezoneOffset) {
+		this.timezoneOffset = timezoneOffset;
+	}
+	
+	public void setTimezoneOffset() {
+	    DateTimeZone tz = DateTimeZone.getDefault();
+	    Long instant = DateTime.now().getMillis();
+
+	    String name = tz.getName(instant);
+
+	    long offsetInMilliseconds = tz.getOffset(instant);
+	    long hours = TimeUnit.MILLISECONDS.toHours( offsetInMilliseconds );
+    
+		this.timezoneOffset = (int) hours;
+	}
+	
 }
 
 
