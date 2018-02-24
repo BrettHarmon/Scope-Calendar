@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, ScrollView, DeviceEventEmitter } from 'react-native';
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 import * as Settings from './Settings.js' //Include on every page
 import Nav from './Nav'
@@ -15,7 +16,7 @@ export class CreateAccountScreen extends React.Component {
     };
   render() {
     return (
-        <View>
+        <View style={styles.container}>
             <LoginBox navigation={this.props.navigation}/>
         </View>
     );
@@ -43,8 +44,7 @@ class LoginBox extends React.Component {
         let password = this.state.password;
         let password2 = this.state.password2;
         let email = this.state.email;
-        //console.log(username);
-        //console.log(password);
+
         var that = this;
         return(fetch( Settings.HOME_URL + '/signup', {
             method: 'POST',
@@ -104,7 +104,7 @@ class LoginBox extends React.Component {
 
     render() {
         return (
-            <View style={styles.bodyView}>
+            <ScrollView style={styles.bodyView} >
                 <Text style={{color: "#d10000", textAlign: 'center'}}>{this.state.generalErr}</Text>
                 <View style= {styles.InputSpan}>
                     <Text style= {styles.TInputLabel}>Username</Text>
@@ -148,9 +148,9 @@ class LoginBox extends React.Component {
                     />
                 </View>
 
-            <Button title="Create Account" onPress={this.createAccount.bind(this)} />
-
-            </View>
+                <Button title="Create Account" onPress={this.createAccount.bind(this)} />
+                <KeyboardSpacer/>
+            </ScrollView>
         )
     }
 

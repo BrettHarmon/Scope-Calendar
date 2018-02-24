@@ -1,18 +1,22 @@
 package scopeCalendar.models;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Target;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
-
-import javax.persistence.*;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 
 @Entity
@@ -114,8 +118,6 @@ public class Event implements Serializable {
 	public void setTimezoneOffset() {
 	    DateTimeZone tz = DateTimeZone.getDefault();
 	    Long instant = DateTime.now().getMillis();
-
-	    String name = tz.getName(instant);
 
 	    long offsetInMilliseconds = tz.getOffset(instant);
 	    long hours = TimeUnit.MILLISECONDS.toHours( offsetInMilliseconds );

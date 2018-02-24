@@ -15,7 +15,7 @@ export class LoginScreen extends React.Component {
     };
     render() {
         return (
-            <View>
+            <View style={styles.container}>
                 <LoginBox navigation={this.props.navigation}/>
             </View>
         );
@@ -37,7 +37,6 @@ class LoginBox extends React.Component {
         var that = this;
 
         const querystring = require('querystring');
-        console.log(querystring.stringify({email: 'testerrrr', password: 'password',}));
 
         return (
             fetch( Settings.HOME_URL + '/signin', {
@@ -52,20 +51,27 @@ class LoginBox extends React.Component {
                 })
             })
             .then((response) => {
-                response.json().then(function (json) {
-                    console.log('Log in response: ', json.username);
-                    //Cookie to perserve authenticted user
-                    let user = {
-                            //id: json.userId,
-                            username: json.username,
-                    };
-                    //Keychain.setGenericPassword(json.username, "password");
-                    //Storage.set('UserInfo', json.username); //JSON.stringify(user));
-                    //AsyncStorage.setItem();
-                    DeviceEventEmitter.emit('refreshHome',  json.username);
-                    that.props.navigation.popToTop(); //go back to start
-                })
-            })
+                //console.log(response);
+                if(response.ok ) {
+                    response.json().then(function (json) {
+                        console.log('Log in response: ', json.username);
+                        //Cookie to perserve authenticted user
+                        let user = {
+                                //id: json.userId,
+                                username: json.username,
+                        };
+                        //Keychain.setGenericPassword(json.username, "password");
+                        //Storage.set('UserInfo', json.username); //JSON.stringify(user));
+                        //AsyncStorage.setItem();
+                        DeviceEventEmitter.emit('refreshHome',  json.username);
+                        that.props.navigation.popToTop(); //go back to start
+                    });
+                }
+                else{
+                    that.setState({error: "Could not find account with that username/email and password."});
+                }
+            }) 
+            
             .catch((err) => {
                 that.setState({error: err});
                 console.error(err);

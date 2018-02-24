@@ -71,14 +71,14 @@ class OrganizationProfile extends React.Component {
         if(this.state.subscribed){
             //Display a subscribed button
             return(
-                <TouchableOpacity style={{backgroundColor: : "#6b52ae", alignItems: 'center',}} onPress={this._onPressButton}>
+                <TouchableOpacity style={{backgroundColor: "#6b52ae", alignItems: 'center',}} onPress={this._onPressButton}>
                   <Text>Subscribed</Text>
-                  <Iconz name="md-checkmark" /color ="#fff" /*size={28}*//>
+                  <Iconz name="md-checkmark" color ="#fff" /*size={28}*//>
                 </TouchableOpacity>
             );
         }else{
             return(
-                <TouchableOpacity style={{backgroundColor: : "#6b52ae", alignItems: 'center',}} onPress={this._onPressButton}>
+                <TouchableOpacity style={{backgroundColor: "#6b52ae", alignItems: 'center',}} onPress={this._onPressButton}>
                   <Text>Subscribe</Text>
                 </TouchableOpacity>
             );
@@ -98,7 +98,7 @@ class OrganizationProfile extends React.Component {
                   // the list of items that have to be displayed in agenda. If you want to render item as empty date
                   // the value of date key kas to be an empty array []. If there exists no value for date key it is
                   // considered that the date in question is not yet loaded
-                  items=this.state.upcomingEvents
+                  items={this.state.upcomingEvents}
                   // callback that gets called when items for a certain month should be loaded (month became visible)
                   loadItemsForMonth={(month) => {console.log('trigger items loading')}}
                   // callback that fires when the calendar is opened or closed
@@ -112,7 +112,7 @@ class OrganizationProfile extends React.Component {
                   // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
                   minDate={today.now()}
                   // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-                  maxDate={then.getDate() + 31}
+                  maxDate={today.getDate() + 31}
                   // Max amount of months allowed to scroll to the past. Default = 50
                   pastScrollRange={0}
                   // Max amount of months allowed to scroll to the future. Default = 50

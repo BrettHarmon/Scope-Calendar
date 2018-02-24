@@ -27,8 +27,12 @@ module.exports = StyleSheet.create({
     },
 
     bodyView: {
+        flex: 1,
         marginHorizontal: 25,
         marginVertical: 10,
         backgroundColor: '#fff',
     },
+    container: {
+        flex: 1
+    }
 });

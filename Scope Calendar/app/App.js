@@ -11,8 +11,8 @@ var Storage = require('./IStorage.js');
 
 import * as Settings from './Settings.js' //Include on every page
 import { CreateAccountScreen } from './CreateAccount'
-import { DetailsScreen } from './Index'
-import { LoggedInHome } from './Index'
+import { DetailsScreen } from './Home'
+import { LoggedInHome, NotLoggedInHome } from './Home'
 import { LoginScreen } from './Login'
 import {CreateOrganizationScreen} from "./CreateOrganization";
 
@@ -50,7 +50,9 @@ class HomeHeader extends React.Component {
 class HomeScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         drawerLabel: () => null,
-        headerTitle: <HomeHeader />,
+        headerTitle: ( 
+            <Text style={{paddingLeft:35,fontWeight: 'bold', color: '#fff', fontSize:22}}>Home</Text>
+        ),
         headerLeft: (
             <Iconz name="md-menu" color ="#fff" size={28} style={{marginLeft: 10}} onPress={() => navigation.navigate('DrawerToggle')}/>
         )
@@ -58,24 +60,40 @@ class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        username = '';
-        userId = '';
-         //AsyncStorage.getItem(('UserInfo'), (errors, value) =>{ info = value});
-         //console.log(info);
-         //let obj = JSON.parse(info);
-         //console.log(obj.id);
          this.state = {
-             username : username,
-             userId   : userId,
+             username : '',
+             userId   : '',
+             ready: false
          };
-         //Create a refresh listener
-         // (HomeScreen shouldn't be constructed more than once)
-         DeviceEventEmitter.addListener('refreshHome', (e)=>{
-             this.buildCookies(e);
-         });
+    }
+    componentWillMount() {
+        this.UserInfoFetch().then((ret) => {
+            if(ret = ''){
+                ret = null;
+            }
+            this.setState({ready:true, username: ret});
+        });
+        //TODO: Store session info into cookie
     }
 
-
+    //Fetch is inheriently async which messes with fetching user info
+    UserInfoFetch(){
+        return fetch( Settings.HOME_URL + '/LoginAuth', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+               "Content-type": "application/x-www-form-urlencoded",
+            },
+        })
+        .then((response) => {
+           return response.json().then(function (json) {
+                username = json.username;
+                return json.username;
+            })
+        }).catch((error) => {
+            this.showError('Error Signing Up, Please Try Again.');
+        });
+    }
 
      //will rebuild login cookies and refresh homescreen with setState()
      buildCookies(props){
@@ -92,27 +110,11 @@ class HomeScreen extends React.Component {
          console.log('Refreshing homepage...', props);
      }
 
-     testLoggedin(){
-         fetch( Settings.HOME_URL + '/LoginAuth', {
-
-             method: 'GET',
-             headers: {
-                 'Accept': 'application/json',
-                "Content-type": "application/x-www-form-urlencoded",
-             },
-         })
-         .then((response) => {
-             response.json().then(function (json) {
-                 //Executes only with authenticated user
-                 console.log('authentication ', json);
-             }).catch((error) => {
-                 console.log('User is not logged in.');
-             })
-         })
-
-     }
 
   render() {
+      if(!this.state.ready){
+          return null; // wait until a session response has been returned
+      }
     return (
         <View style={{ flex: 1}}>
         {this.HomeGreeting()}
@@ -129,32 +131,13 @@ class HomeScreen extends React.Component {
             //Try one more time to get UserInfo
             //AsyncStorage.getItem(('UserInfo'), (errors, value) => {that.setState({userInfo : value}));
         }
-        console.log(this.state.username);
+        console.log("home greeting: username",this.state.username);
         if(!!this.state.username){
-            console.log("logged in")
             //Logged in
             return(<LoggedInHome navigation={this.props.navigation} username={this.state.username} userId={this.state.userId}/>);
         }
         else{
-            console.log("not logged in")
-            return(
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <Button
-                      title="Sign Up"
-                      onPress={() => this.props.navigation.navigate('CreateAccount')}
-                    />
-
-                    <Button
-              			title="Login"
-              			onPress={() => this.props.navigation.navigate('Login')}
-         			 />
-
-                     <Button
-               			title="Test Login"
-               			onPress={() => this.testLoggedin()}
-          			 />
-                </View>
-            );
+            return <NotLoggedInHome  navigation={this.props.navigation} />
         }
     }
 }
