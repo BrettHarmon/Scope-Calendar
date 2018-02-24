@@ -24,4 +24,17 @@ public class CompoundModels {
 		
 	}
 	
+	public static class CreateOrganizationCM {
+		@Valid
+		public Organization organization;
+		public Organization getOrganization() {
+			return organization;
+		}
+
+		public void setUser(Organization organization) {
+			this.organization = organization;
+		}
+		
+	}
+	
 }

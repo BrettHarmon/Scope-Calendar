@@ -27,11 +27,7 @@ class CreateOrganizationBox extends React.Component {
         this.state = {name : '',
             description : '',
             owner : '',
-            userId: '',
-            generalErr:'',
-            usernameErr: '',
-            emailErr: '',
-            passwordErr: ''};
+            generalErr:'',};
     }
 
     createOrganization(event) {
@@ -61,18 +57,9 @@ class CreateOrganizationBox extends React.Component {
                 else{
                     response.json().then(function (json) {
 
-                        //Cookie to perserve authenticted user
-                        /*let user = {
-                                id: json.userId,
-                                username: json.username,
-                                ROLE_LIST: json.role
-                        };
-
-                        AsyncStorage.setItem('UserInfo', JSON.stringify(user));
-    */
-                        //Keychain.setGenericPassword(json.username, "password");
-                        that.props.navigation.navigate()
-
+                        // for now just going back to homepage. checked to see if it worked on backend
+                        //that.props.navigation.navigate('OrganizationProfile', {organization: json.organization.organizationId, nagivation: that.props.navigation});
+                            that.props.navigation.popToTop();
                     });
                 }
             }))
@@ -88,48 +75,24 @@ class CreateOrganizationBox extends React.Component {
             <View style={styles.bodyView}>
                 <Text style={{color: "#d10000", textAlign: 'center'}}>{this.state.generalErr}</Text>
                 <View style= {styles.InputSpan}>
-                    <Text style= {styles.TInputLabel}>Username</Text>
+                    <Text style= {styles.TInputLabel}>Name</Text>
                     <TextInput
                         style = {styles.TInput}
-                        onChangeText={(username) => this.setState({username})}
-                        value={this.state.username}
+                        onChangeText={(name) => this.setState({name})}
+                        value={this.state.name}
                     />
-                    <Text style={styles.hiddenError}>{this.state.usernameErr}</Text>
                 </View>
 
                 <View style= {styles.InputSpan}>
-                    <Text style= {styles.TInputLabel}>Email</Text>
+                    <Text style= {styles.TInputLabel}>Description</Text>
                     <TextInput
                         style = {styles.TInput}
-                        onChangeText={(email) => this.setState({email})}
-                        keyboardType = {"email-address"}
-                        value={this.state.email}
-                    />
-                    <Text style={styles.hiddenError}>{this.state.emailErr}</Text>
-                </View>
-
-                <View style= {styles.InputSpan}>
-                    <Text style= {styles.TInputLabel}>Password</Text>
-                    <TextInput
-                        style = {styles.TInput}
-                        secureTextEntry= {true}
-                        onChangeText={(password) => this.setState({password})}
-                        value={this.state.password}
-                    />
-                    <Text style={styles.hiddenError}>{this.state.passwordErr}</Text>
-                </View>
-
-                <View style= {styles.InputSpan}>
-                    <Text style= {styles.TInputLabel}>Confirm password</Text>
-                    <TextInput
-                        style = {styles.TInput}
-                        secureTextEntry= {true}
-                        onChangeText={(password2) => this.setState({password2})}
-                        value={this.state.password2}
+                        onChangeText={(description) => this.setState({description})}
+                        value={this.state.description}
                     />
                 </View>
 
-                <Button title="Create Account" onPress={this.createAccount.bind(this)} />
+                <Button title="Create Organization" onPress={this.createOrganization.bind(this)} />
 
             </View>
         )

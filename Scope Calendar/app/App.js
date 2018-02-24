@@ -14,6 +14,7 @@ import { CreateAccountScreen } from './CreateAccount'
 import { DetailsScreen } from './Index'
 import { LoggedInHome } from './Index'
 import { LoginScreen } from './Login'
+import { OrganizationProfileScreen} from "./Organization";
 import {CreateOrganizationScreen} from "./CreateOrganization";
 
 
@@ -178,7 +179,7 @@ const RootStack = StackNavigator(
     },
     CreateOrganization: {
         screen: CreateOrganizationScreen,
-    }
+    },
 
   },
   {
