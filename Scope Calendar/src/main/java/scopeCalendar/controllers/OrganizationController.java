@@ -2,8 +2,6 @@ package scopeCalendar.controllers;
 
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +52,7 @@ public class OrganizationController {
 	@ResponseBody
 	public ResponseEntity<?> OrganizationProfile(@RequestBody long OrganizationId, UriComponentsBuilder ucb, 
 									Model model) {
-		String error = "";
+		//String error = "";
 		Organization org = organizationRepository.getOne(OrganizationId);
 
 		//TODO: compile upcomingEvents object
@@ -69,10 +67,12 @@ public class OrganizationController {
 	public ResponseEntity<?>  organizationTest() {
 		long orgId = 1;
 		Set<Event> evts = null;
-		Organization org = organizationRepository.findByOrganizationId(orgId);
+		Organization org = organizationRepository.getOne(orgId);
 		evts = org.getEvents();
 		User user = org.getOwner();
+		System.out.println(evts +""+ user);
 		return ResponseEntity.status(HttpStatus.OK).body("");
+		
 
 	}
 }
