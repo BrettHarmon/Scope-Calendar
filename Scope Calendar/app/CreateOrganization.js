@@ -4,7 +4,6 @@ import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
 
 import * as Settings from './Settings.js' //Include on every page
-import Nav from './Nav'
 var styles = require('./Styles.js');
 
 
@@ -24,7 +23,8 @@ export class CreateOrganizationScreen extends React.Component {
 class CreateOrganizationBox extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {name : '',
+        this.state = {
+            name : '',
             description : '',
             owner : '',
             generalErr:'',};

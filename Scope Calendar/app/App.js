@@ -55,7 +55,9 @@ class HomeScreen extends React.Component {
             <Text style={{paddingLeft:35,fontWeight: 'bold', color: '#fff', fontSize:22}}>Home</Text>
         ),
         headerLeft: (
-            <Iconz name="md-menu" color ="#fff" size={28} style={{marginLeft: 10}} onPress={() => navigation.navigate('DrawerToggle')}/>
+            <TouchableOpacity  onPress={() => navigation.navigate('DrawerToggle')}>
+                <Iconz name="md-menu" color ="#fff" size={28} style={{marginLeft: 10}}/>
+            </TouchableOpacity>
         )
     });
 
@@ -69,7 +71,7 @@ class HomeScreen extends React.Component {
     }
     componentWillMount() {
         this.UserInfoFetch().then((ret) => {
-            if(ret = ''){
+            if(!ret){
                 ret = null;
             }
             this.setState({ready:true, username: ret});
@@ -163,6 +165,9 @@ const RootStack = StackNavigator(
     CreateOrganization: {
         screen: CreateOrganizationScreen,
     },
+    TestOrganizationProfile :{
+        screen: (props) => <OrganizationProfileScreen {...props} OrganizationId= {1} />
+    },
 
   },
   {
@@ -184,12 +189,20 @@ const Drawer = DrawerNavigator({
     Stack: {
       screen: RootStack,
     },
+    TestOrganizationProfile :{
+        screen: (props) => <OrganizationProfileScreen {...props} navigation={this.props.navigation} OrganizationId= {1} />
+    },
+    Details: {
+          screen: DetailsScreen,
+    },
     //CreateAccount: {
     //    screen: CreateAccountScreen,
     //},
 },
 {
-  drawerWidth: () =>  {return (Dimensions.get('window').width * .75)}
+  drawerWidth: () =>  {return (Dimensions.get('window').width * .75)},
+
+
 })
 
 export default Drawer;

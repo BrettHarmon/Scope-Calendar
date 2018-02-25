@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import scopeCalendar.models.CompoundModels.CreateOrganizationCM;
+import scopeCalendar.models.CompoundModels.SimpleId;
 import scopeCalendar.models.Event;
 import scopeCalendar.models.Organization;
 import scopeCalendar.models.User;
@@ -52,12 +54,12 @@ public class OrganizationController {
 		
 	}
 	
-	@PostMapping(value = {"info"}, produces = "application/json")
-	@ResponseBody
-	public ResponseEntity<?> OrganizationProfile(@RequestBody long OrganizationId, UriComponentsBuilder ucb, 
+	@PostMapping(value = {"info"}, consumes = "application/json", produces = "application/json")
+	//@ResponseBody
+	public ResponseEntity<?> OrganizationProfile(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
 									Model model) {
 		//String error = "";
-		Organization org = organizationRepository.getOne(OrganizationId);
+		Organization org = organizationRepository.getOne(idObj.getId());
 
 		//TODO: compile upcomingEvents object
 		return ResponseEntity.status(HttpStatus.OK).body(org);

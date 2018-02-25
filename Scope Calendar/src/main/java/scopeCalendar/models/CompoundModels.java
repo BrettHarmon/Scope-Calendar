@@ -36,5 +36,15 @@ public class CompoundModels {
 		}
 		
 	}
+
+	public static class SimpleId{
+		public long Id;
+		public long getId(){
+			return Id;
+		}
+		public void getId(long Id){
+			this.Id = Id;
+		}
+	}
 	
 }

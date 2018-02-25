@@ -1,12 +1,25 @@
 import React from 'react';
-import {TouchableOpacity, Button, Text, View, AsyncStorage} from 'react-native';
+import {StyleSheet, Dimensions,    TouchableOpacity, Button, Text, View, Alert, AsyncStorage} from 'react-native';
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
+import * as Settings from './Settings.js' //Include on every page
+var styles = require('./Styles.js');    
+
 export class OrganizationProfileScreen extends React.Component {
+    static navigationOptions = ({ navigation }) => {
+        const {state} = navigation;
+        let defaultTitle = 'Organization Profile'
+        return {
+            title: typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? defaultTitle: navigation.state.params.title,
+        };
+      };
+
     constructor(props){
         super(props);
+        console.log(this.props.Id, this.props.OrganizationId)
     }
+
     render() {
         return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -20,22 +33,56 @@ export class OrganizationProfileScreen extends React.Component {
 class OrganizationProfile extends React.Component {
     constructor(props){
         super(props);
-        var name,isSubbed,description,upcomingEvents;
-        fetch( Settings.HOME_URL + '/organization/info', {
+        this.state = {
+            ready: false,
+            name : '',
+            subscribed: null,
+            description : '',
+            upcomingEvents: {},
+            items: {}
+        };
+    }
+
+    componentWillMount(){
+        this.getOrganization(this.props.Id)
+        .then((org) => {
+            if (!!org){ //org object exists (not undefined/null/empty string)
+                this.props.navigation.setParams({ title: org.name });
+                console.log('Organization object:: ',org)
+                this.setState({
+                    name: org.name,
+                    subscribed: org.isSubbed,
+                    description: org.description,
+                    ready: true,
+                    upcomingEvents:{}
+                });
+            }else{
+                this.setState({ ready: true });
+            }
+        })
+    }
+    
+    getOrganization(id){
+        return fetch( Settings.HOME_URL + '/organization/info', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                OrganizationId: this.props.Id
+                Id: id
             })
         })
         .then((response) => {
-            response.json().then(function (json) {
-                name = json.name;
-                description = json.description;
-                isSubbed = isSubscribed;
+            console.log(id, response)
+            if(!response.ok){
+                return null;
+            }
+            return response.json().then(function (json) {
+                let result = {};
+                result.name = json.name;
+                result.description = json.description;
+                result.isSubbed = isSubscribed;
                 //TODO: set upcoming events
                 /*
                 {
@@ -46,26 +93,12 @@ class OrganizationProfile extends React.Component {
                   dateString: '2016-05-13' // date formatted as 'YYYY-MM-DD' string
                 }
                 */
+               return result;
             })
         })
         .catch(console.log("error loading organization details")); //TODO: Handle this in UI
-
-
-        this.state = {
-            name : name,
-            subscribed: isSubbed,
-            description : description,
-            upcomingEvents: upcomingEvents
-        };
-        if(!!name){
-            this.props.navigation.setParams({ title: name });
-        }
-
     }
 
-    static navigationOptions = {
-        title: 'Organization Profile'
-    }
 
     SubscribeButton(){
         if(this.state.subscribed){
@@ -86,72 +119,92 @@ class OrganizationProfile extends React.Component {
     }
 
     render() {
+        if(!this.state.ready){
+            return null;
+        }
         var today = new Date();
+        var oneWeek = new Date(today);
+        oneWeek.setDate(today.getDate() + 7);
+        var wide = Dimensions.get('window').width;
+
         return (
-            <View style={{ flex: 1}}>
+            <View style={styles.bodyView}>
                 {this.SubscribeButton()}
                 <View>
                     <Text> Upcoming Events </Text>
                 </View>
 
                 <Agenda
-                  // the list of items that have to be displayed in agenda. If you want to render item as empty date
-                  // the value of date key kas to be an empty array []. If there exists no value for date key it is
-                  // considered that the date in question is not yet loaded
-                  items={this.state.upcomingEvents}
-                  // callback that gets called when items for a certain month should be loaded (month became visible)
-                  loadItemsForMonth={(month) => {console.log('trigger items loading')}}
-                  // callback that fires when the calendar is opened or closed
-                  onCalendarToggled={(calendarOpened) => {console.log(calendarOpened)}}
-                  // callback that gets called on day press
-                  onDayPress={(day)=>{console.log('day pressed')}}
-                  // callback that gets called when day changes while scrolling agenda list
-                  onDayChange={(day)=>{console.log('day changed')}}
-                  // initially selected day
-                  selected={today.now()}
-                  // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-                  minDate={today.now()}
-                  // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-                  maxDate={today.getDate() + 31}
-                  // Max amount of months allowed to scroll to the past. Default = 50
-                  pastScrollRange={0}
-                  // Max amount of months allowed to scroll to the future. Default = 50
-                  futureScrollRange={12}
-                  // specify how each item should be rendered in agenda
-                  //renderItem={(item, firstItemInDay) => {return (<View />);}}
-                  // specify how each date should be rendered. day can be undefined if the item is not first in that day.
-                  //renderDay={(day, item) => {return (<View />);}}
-                  // specify how empty date content with no items should be rendered
-                  //renderEmptyDate={() => {return (<View />);}}
-                  // specify how agenda knob should look like
-                  //renderKnob={() => {return (<View />);}}
-                  // specify what should be rendered instead of ActivityIndicator
-                  //renderEmptyData = {() => {return (<View />);}}
-                  // specify your item comparison function for increased performance
-                  //rowHasChanged={(r1, r2) => {return r1.text !== r2.text}}
-                  // Hide knob button. Default = false
-                  //hideKnob={true}
-                  // By default, agenda dates are marked if they have at least one item, but you can override this if needed
-                  /*markedDates={{
-                    '2012-05-16': {selected: true, marked: true},
-                    '2012-05-17': {marked: true},
-                    '2012-05-18': {disabled: true}
-                  }}
-
-                  // agenda theme
-                  theme={{
-                    ...calendarTheme,
-                    agendaDayTextColor: 'yellow',
-                    agendaDayNumColor: 'green',
-                    agendaTodayColor: 'red',
-                    agendaKnobColor: 'blue'
-                  }}
-                  // agenda container style
-                  style={{}}
-                  */
+                    items={this.state.items}
+                    loadItemsForMonth={this.loadItems.bind(this)}
+                    selected={'2017-05-16'}
+                    renderItem={this.renderItem.bind(this)}
+                    renderEmptyDate={this.renderEmptyDate.bind(this)}
+                    rowHasChanged={this.rowHasChanged.bind(this)}
+                    // markingType={'period'}
+                    style= {{width: wide}}
+                    // markedDates={{
+                    //    '2017-05-08': {textColor: '#666'},
+                    //    '2017-05-09': {textColor: '#666'},
+                    //    '2017-05-14': {startingDay: true, endingDay: true, color: 'blue'},
+                    //    '2017-05-21': {startingDay: true, color: 'blue'},
+                    //    '2017-05-22': {endingDay: true, color: 'gray'},
+                    //    '2017-05-24': {startingDay: true, color: 'gray'},
+                    //    '2017-05-25': {color: 'gray'},
+                    //    '2017-05-26': {endingDay: true, color: 'gray'}}}
+                    // monthFormat={'yyyy'}
+                    // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
+                    //renderDay={(day, item) => (<Text>{day ? day.day: 'item'}</Text>)}
                 />
-
             </View>
         );
     }
+    loadItems(day) {
+        console.log('loaded event items for day',day);
+        setTimeout(() => {
+          for (let i = -15; i < 85; i++) {
+            const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+            const strTime = this.timeToString(time);
+            if (!this.state.items[strTime]) {
+              this.state.items[strTime] = [];
+              const numItems = Math.floor(Math.random() * 5);
+              for (let j = 0; j < numItems; j++) {
+                this.state.items[strTime].push({
+                  name: 'Item for ' + strTime,
+                  height: Math.max(50, Math.floor(Math.random() * 150))
+                });
+              }
+            }
+          }
+          //console.log(this.state.items);
+          const newItems = {};
+          Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
+          this.setState({
+            items: newItems
+          });
+        }, 1000);
+        // console.log(`Load Items for ${day.year}-${day.month}`);
+    }
+
+    renderItem(item) {
+        return (
+            <View style={[styles.agnedaItem, {height: item.height}]}><Text>{item.name}</Text></View>
+        );
+    }
+
+    renderEmptyDate() {
+    return (
+        <View style={styles.agendaEmptyDate}><Text>Nothing planned today.</Text></View>
+    );
+    }
+
+    rowHasChanged(r1, r2) {
+    return r1.name !== r2.name;
+    }
+
+    timeToString(time) {
+    const date = new Date(time);
+    return date.toISOString().split('T')[0];
+    }
 }
+

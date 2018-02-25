@@ -6,7 +6,6 @@ import * as Keychain from 'react-native-keychain';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 import * as Settings from './Settings.js' //Include on every page
-import Nav from './Nav'
 var styles = require('./Styles.js');
 
 
