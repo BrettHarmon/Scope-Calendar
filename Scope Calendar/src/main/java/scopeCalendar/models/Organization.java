@@ -7,6 +7,8 @@ import javax.persistence.*;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "organizations")
 public class Organization implements Serializable {
@@ -26,12 +28,20 @@ public class Organization implements Serializable {
 	
 	@ManyToOne(optional = false)
 	@JoinColumn(name="ownerId", nullable=false)
+	@JsonIgnore
 	private User owner;
 	
-	@ManyToMany(mappedBy = "subscribedOrganizations") //Junction table created on user.subscribedOrganizations 
-	private Set<User> users;
+	@ManyToMany(targetEntity=User.class)
+    @JoinTable(
+          name="user_organization_junction",
+    		  joinColumns=@JoinColumn(name="organizationId"),
+    		  inverseJoinColumns=@JoinColumn(name="userId")
+        )
+	@JsonIgnore
+	private Set<User> subbedUsers;
 	
 	@OneToMany(mappedBy = "organization")
+	@JsonIgnore
 	private Set<Event> events;
 	
 	public long getOrganizationId() {
@@ -58,13 +68,20 @@ public class Organization implements Serializable {
 		this.owner = owner;
 	}
 
-	public Set<User> getUsers() {
-		return users;
+	public Set<User> getSubbedUsers() {
+		return subbedUsers;
 	}
 
-	public void setUsers(Set<User> users) {
-		this.users = users;
+	public void setSubbedUsers(Set<User> users) {
+		this.subbedUsers = users;
 	}
+	public void addSubscriber(User user) {
+		subbedUsers.add(user);
+	}
+	public void removeSubscriber(User user) {
+		subbedUsers.remove(user);
+	}
+
 
 	public String getDescription() {
 		return description;

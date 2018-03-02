@@ -18,6 +18,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "events")
@@ -38,14 +40,15 @@ public class Event implements Serializable {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="organizationId", nullable=false)
-	private Organization organization;
+    @JsonIgnore
+    private Organization organization;
 
     @Column(name = "startDate")
-    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime start;
 
     @Column(name = "endDate")
-    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime end;
     
     @Column(name = "TimeZoneOffset")
@@ -96,7 +99,7 @@ public class Event implements Serializable {
         this.start = startDate;
     }
 
-    public DateTime getStateDate() {
+    public DateTime getEndDate() {
         return end;
     }
 

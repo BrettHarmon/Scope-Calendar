@@ -5,7 +5,7 @@ import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import * as Keychain from 'react-native-keychain';
 //import Iconz from 'react-native-vector-icons/MaterialIcons'; //https://material.io/icons/
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
-//var styles = require('./Styles.js');
+var styles = require('./Styles.js');
 var Storage = require('./IStorage.js');
 
 
@@ -68,6 +68,9 @@ class HomeScreen extends React.Component {
              userId   : '',
              ready: false
          };
+         DeviceEventEmitter.addListener('refreshHome', (e)=>{
+            this.buildCookies(e);
+        });
     }
     componentWillMount() {
         this.UserInfoFetch().then((ret) => {
@@ -91,10 +94,13 @@ class HomeScreen extends React.Component {
         .then((response) => {
            return response.json().then(function (json) {
                 username = json.username;
+                if(username == 'anonymousUser'){ //ran in debug with all authentication allowed
+                    return null;
+                }
                 return json.username;
             })
         }).catch((error) => {
-            this.showError('Error Signing Up, Please Try Again.');
+            console.log('Error with userInfoFetch');
         });
     }
 
@@ -106,11 +112,9 @@ class HomeScreen extends React.Component {
          .catch(function(error) {
              info = '';
          });*/
-         console.log(props);
          this.setState({
             username : props,
         });
-         console.log('Refreshing homepage...', props);
      }
 
 
@@ -166,7 +170,7 @@ const RootStack = StackNavigator(
         screen: CreateOrganizationScreen,
     },
     TestOrganizationProfile :{
-        screen: (props) => <OrganizationProfileScreen {...props} OrganizationId= {1} />
+       screen: OrganizationProfileScreen
     },
 
   },
@@ -189,9 +193,9 @@ const Drawer = DrawerNavigator({
     Stack: {
       screen: RootStack,
     },
-    TestOrganizationProfile :{
-        screen: (props) => <OrganizationProfileScreen {...props} navigation={this.props.navigation} OrganizationId= {1} />
-    },
+    //TestOrganizationProfile :{
+    //    screen: OrganizationProfileScreen
+    //},
     Details: {
           screen: DetailsScreen,
     },

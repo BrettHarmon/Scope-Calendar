@@ -1,7 +1,13 @@
 package scopeCalendar.controllers;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +23,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import scopeCalendar.models.CompoundModels.CreateOrganizationCM;
+import scopeCalendar.models.CompoundModels.OrganizationRespone;
 import scopeCalendar.models.CompoundModels.SimpleId;
 import scopeCalendar.models.Event;
 import scopeCalendar.models.Organization;
 import scopeCalendar.models.User;
+import scopeCalendar.repos.EventRepository;
 import scopeCalendar.repos.OrganizationRepository;
 import scopeCalendar.repos.UserRepository;
+import scopeCalendar.services.EventTimeComparer;
 
 @Controller
 @RequestMapping("/organization/*")
@@ -33,6 +42,9 @@ public class OrganizationController {
 	
 	@Autowired
 	OrganizationRepository organizationRepository;
+	
+	@Autowired
+	EventRepository eventRepository;
 	
 
 	@PostMapping(value = {"create"}, produces = "application/json")
@@ -55,18 +67,57 @@ public class OrganizationController {
 	}
 	
 	@PostMapping(value = {"info"}, consumes = "application/json", produces = "application/json")
-	//@ResponseBody
+	@ResponseBody
 	public ResponseEntity<?> OrganizationProfile(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
 									Model model) {
-		//String error = "";
+		
 		Organization org = organizationRepository.getOne(idObj.getId());
-
-		//TODO: compile upcomingEvents object
-		return ResponseEntity.status(HttpStatus.OK).body(org);
+		OrganizationRespone result = new OrganizationRespone();
+		result.setName(org.getName());
+		result.setDescription(org.getDescription());
+		result.setSubscribers(String.valueOf(org.getSubbedUsers().size()));
+		
+		//find out if user is a subscriber to organization
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		User loggedIn = userRepository.findByUsernameIgnoreCase(username);
+		result.setIsSubscribed( String.valueOf(org.getSubbedUsers().contains(loggedIn)));
 		
 		
+		List<Event> evts = new LinkedList<> (org.getEvents());
+		evts.sort(new EventTimeComparer());
+		result.setEvents(evts);
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 	
+	//A means to 'toggle' a subscription on or off
+	@PostMapping(value = {"subscription"}, consumes = "application/json", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> ToggleSubscription(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
+									Model model) {
+		
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		User loggedIn = userRepository.findByUsernameIgnoreCase(username);
+		Organization org = organizationRepository.getOne(idObj.getId());
+		
+		if(loggedIn == null || org == null) {
+			return new ResponseEntity<Object>("Error finding organization or user", HttpStatus.BAD_REQUEST);
+		}
+		boolean subbed = loggedIn.getSubscribedOrganizations().contains(org);
+		
+		HashMap<String, String> response = new HashMap<>();
+		
+		if(subbed) {
+			org.removeSubscriber(loggedIn);
+			response.put("subbed", "false");
+		}
+		else {
+			org.addSubscriber(loggedIn);
+			response.put("subbed", "true");
+		}
+		
+		organizationRepository.save(org);
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
+	}
 	
 	
 	@RequestMapping( value = {"test"}, method ={RequestMethod.GET, RequestMethod.POST} )

@@ -32,6 +32,7 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-test")
     compile 'joda-time:joda-time:2.9.9'
     compile group: 'joda-time', name: 'joda-time-hibernate', version: '1.4'
+    compile group: 'org.jadira.usertype', name: 'usertype.jodatime', version: '2.0.1'
     testCompile 'junit:junit:4.12'
     compile 'junit:junit:4.12'
 }

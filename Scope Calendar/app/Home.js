@@ -3,6 +3,7 @@ import React from 'react';
 import {Button, Text, View, AsyncStorage} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
+var styles = require('./Styles.js');
 export class DetailsScreen extends React.Component {
   render() {
     return (
@@ -24,21 +25,29 @@ export class NotLoggedInHome extends React.Component {
 
   render(){
     return(
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Button
-              title="Sign Up"
-              onPress={() => this.props.navigation.navigate('CreateAccount')}
-            />
+        <View style={{flex: 1,  marginHorizontal: 20, marginVertical: 10, backgroundColor: '#fff', justifyContent:'center'}}>
 
-            <Button
-            title="Login"
-            onPress={() => this.props.navigation.navigate('Login')}
-        />
+          <Text style={[{marginTop: 10}, styles.titleText]}>Welcome to Scope Calendar!</Text>
 
-             <Button
-             title="Test Login"
-             onPress={() => this.testLoggedin()}
-         />
+          <View style={styles.FlexBoxContainerEvenRowSpacing}>
+            <View style={styles.FlexBoxRowElement}>
+              <Text style={{textAlign:'center'}}>Get started by creating an account.</Text>
+              <Button
+                title="Sign Up"
+                onPress={() => this.props.navigation.navigate('CreateAccount')}
+              />
+            </View>
+
+            <View style={styles.FlexBoxRowElement}>
+              <Text style={{textAlign:'center'}}>Existing user? Log in to access your calendar.</Text>
+              <Button
+                title="Login"
+                onPress={() => this.props.navigation.navigate('Login')}
+              />
+            </View>
+
+          </View>
+
       </View>
     );
 
@@ -90,7 +99,14 @@ export class LoggedInHome extends React.Component {
                 textDayHeaderFontSize: 16
             }}
           />
-
+          <Button
+            title="Test Organization Profile"
+            onPress={() => {
+              this.props.navigation.navigate('TestOrganizationProfile', {
+                OrganizationId: 2
+              });
+            }}
+          />
       </View>
     );
   }

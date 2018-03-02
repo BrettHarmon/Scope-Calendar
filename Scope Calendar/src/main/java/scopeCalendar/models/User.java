@@ -13,6 +13,8 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
@@ -39,16 +41,13 @@ public class User implements Serializable {
 	@Column(name = "userId")
 	private long userId;
 	
-	@ManyToMany(targetEntity=Organization.class, cascade=CascadeType.ALL)
-    @JoinTable(
-          name="user_organization_junction",
-          joinColumns=@JoinColumn(name="userId"),
-          inverseJoinColumns=@JoinColumn(name="organizationId")
-        )
+	@ManyToMany(mappedBy = "subbedUsers") //Junction table created on Organization.subbedUsers 
+	@JsonIgnore
 	private Set<Organization> subscribedOrganizations;
 	
 	@Transient
 	@OneToMany(mappedBy="owner")
+	@JsonIgnore
     private Set<Organization> orgs;
     
 	public Set<Organization> getOwnedOrganizations() {
@@ -104,4 +103,5 @@ public class User implements Serializable {
 	public void setSubscribedOrganizations(Set<Organization> subscribedOrganizations) {
 		this.subscribedOrganizations = subscribedOrganizations;
 	}
+
 }

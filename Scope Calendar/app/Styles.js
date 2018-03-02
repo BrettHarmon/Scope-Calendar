@@ -4,9 +4,44 @@ import React from 'react';
 import { StyleSheet} from 'react-native';
 
 
-
+var purp = '#6b52ae';
 module.exports = StyleSheet.create({
 
+    //FlexBox styling
+    FlexBoxContainerEvenRowSpacing: {
+        flexWrap: 'wrap',
+        flexDirection:'row', 
+        justifyContent:'space-around'
+    },
+    FlexBoxRowElement: {
+        flex:1, 
+        flexWrap: 'wrap',
+        paddingHorizontal: 3
+    },
+    //
+
+    SubscribeButton:{
+        borderRadius: 6,
+        backgroundColor: purp,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        marginVertical: 5,
+        marginRight: 10,
+        width: 150,
+        flexWrap: 'wrap',
+        flexDirection:'row',
+        justifyContent:'center',
+        alignSelf: 'flex-end',
+    },
+    hr: {
+        height:10,
+        backgroundColor:'#efefef'
+    },
+    TextTitle: {
+        fontSize: 24,
+        paddingVertical: 7,
+        textAlign: 'center',
+    },
     TInput: {
         fontSize:18,
         paddingLeft: 5,
@@ -29,7 +64,7 @@ module.exports = StyleSheet.create({
 
     bodyView: {
         flex: 1,
-        marginHorizontal: 25,
+        marginHorizontal: 20,
         marginVertical: 10,
         backgroundColor: '#fff',
     },
@@ -42,7 +77,7 @@ module.exports = StyleSheet.create({
         flex:1,
         paddingTop: 30
     },
-    agnedaItem: {
+    agendaItem: {
         backgroundColor: 'white',
         flex: 1,
         borderRadius: 5,
