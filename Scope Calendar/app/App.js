@@ -16,9 +16,7 @@ import { LoggedInHome, NotLoggedInHome } from './Home'
 import { LoginScreen } from './Login'
 import { OrganizationProfileScreen} from "./Organization";
 import {CreateOrganizationScreen} from "./CreateOrganization";
-
-
-
+import {OrganizationListScreen} from "./OrganizationList";
 
 
 /*
@@ -58,7 +56,13 @@ class HomeScreen extends React.Component {
             <TouchableOpacity  onPress={() => navigation.navigate('DrawerToggle')}>
                 <Iconz name="md-menu" color ="#fff" size={28} style={{marginLeft: 10}}/>
             </TouchableOpacity>
+        ),
+        headerRight: (
+            <TouchableOpacity  onPress={() => navigation.navigate('OrganizationList')}>
+                <Iconz name="md-school" color ="#fff" size={28} style={{marginRight: 20}}/>
+            </TouchableOpacity>
         )
+
     });
 
     constructor(props) {
@@ -172,7 +176,9 @@ const RootStack = StackNavigator(
     TestOrganizationProfile :{
        screen: OrganizationProfileScreen
     },
-
+    OrganizationList: {
+        screen: OrganizationListScreen
+    }
   },
   {
     initialRouteName: 'Home',

@@ -53,8 +53,12 @@ public class User implements Serializable {
 	public Set<Organization> getOwnedOrganizations() {
 		return orgs;
 	}
-	
-	
+
+	public void setOrgs(Set<Organization> orgs) {
+		this.orgs = orgs;
+	}
+
+
 	public User(){
 
 	}

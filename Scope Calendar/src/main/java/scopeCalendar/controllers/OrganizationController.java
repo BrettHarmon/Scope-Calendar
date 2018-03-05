@@ -1,5 +1,6 @@
 package scopeCalendar.controllers;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,9 +61,47 @@ public class OrganizationController {
 		System.out.println(userInput.getOrganization().getDescription() + userInput.getOrganization().getName());
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		userInput.getOrganization().setOwner(user);
+		// initialize the organization subbed users set
+		userInput.getOrganization().setSubbedUsers(new HashSet<User>());
+		userInput.getOrganization().setEvents(new HashSet<Event>());
+		userInput.getOrganization().addSubscriber(user);
 		organizationRepository.save(userInput.getOrganization());
 		
+		// create the set in user if it is null
+		if (user.getOwnedOrganizations() == null) {
+			user.setOrgs(new HashSet<Organization>());
+		}
+		if (user.getSubscribedOrganizations() == null) {
+			user.setSubscribedOrganizations(new HashSet<Organization>());
+		}
+
+		user.getSubscribedOrganizations().add(userInput.getOrganization());
+		user.getOwnedOrganizations().add(userInput.getOrganization());
+	    userRepository.save(user);
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(userInput);
+		
+		
+	}
+	
+	@GetMapping(value ={"subscribed"}, produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> getSubscribedOrganizations() {
+		//first get the user, then return their subscribed organizations set
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println("Subbed organizations requested");
+		List<Organization> subbed = new ArrayList<Organization>();
+		if (user.getSubscribedOrganizations() == null)
+		{
+			return ResponseEntity.status(HttpStatus.OK).body(subbed);
+		}
+		
+		subbed.addAll(user.getSubscribedOrganizations());
+		for (int i = 0; i < subbed.size(); i++) {
+			System.out.println(subbed.get(i).getName());
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(subbed);
+		
 		
 		
 	}
@@ -118,6 +158,8 @@ public class OrganizationController {
 		organizationRepository.save(org);
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
+	
+	
 	
 	
 	@RequestMapping( value = {"test"}, method ={RequestMethod.GET, RequestMethod.POST} )

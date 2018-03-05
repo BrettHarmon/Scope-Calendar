@@ -13,7 +13,7 @@ export class CreateOrganizationScreen extends React.Component {
     };
     render() {
         return (
-            <View>
+            <View style={styles.container}>
                 <CreateOrganizationBox navigation={this.props.navigation}/>
             </View>
         );
