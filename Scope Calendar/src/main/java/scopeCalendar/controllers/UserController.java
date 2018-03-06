@@ -126,12 +126,13 @@ public class UserController {
 		String error = "";
 		User user = userRepository.findByUsernameIgnoreCase(SecurityContextHolder.getContext().getAuthentication().getName());
 		
+		HashMap<String, Set<Event>> result = new HashMap<>();
 		List<Organization> subbedOrgs = new LinkedList<Organization>(user.getSubscribedOrganizations());
-		List<Set<Event>> subscribedEvents = new LinkedList<>();
+		
 		for(Organization org : subbedOrgs) {
-			subscribedEvents.add(org.getEvents());
+			result.put(org.getName(), org.getEvents());
 		}
-		return ResponseEntity.status(HttpStatus.OK).body(subscribedEvents);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 	
 	@GetMapping(value ={"/LoginAuth"}, produces = "application/json")

@@ -4,6 +4,8 @@ import {Button, Text, View, AsyncStorage} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
 var styles = require('./Styles.js');
+import * as Settings from './Settings.js' //Include on every page
+
 export class DetailsScreen extends React.Component {
   render() {
     return (
@@ -63,6 +65,30 @@ export class LoggedInHome extends React.Component {
     static navigationOptions = {
         title: 'Home'
     }
+
+      componentWillMount(){
+          this.UserEventFetch()
+              .then((events) => {
+
+              })
+      }
+
+      UserEventFetch(){
+          return fetch( Settings.HOME_URL + '/user/getevents', {
+              method: 'POST',
+              headers: { 'Accept': 'application/json' },
+            })
+              .then((response) => {
+                  return response.json().then(function (body) {
+                      console.log(body);
+                  })
+                  return null;
+              }).catch((error) => {
+                  console.log('Error with UserEventFetch');
+              });
+      }
+
+
   render() {
     return (
       <View style={{ flex: 1}}>
