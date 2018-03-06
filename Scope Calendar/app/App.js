@@ -10,6 +10,7 @@ var Storage = require('./IStorage.js');
 
 
 import * as Settings from './Settings.js' //Include on every page
+import { LoadingSpinner } from './components/loadingSpinner.js'
 import { CreateAccountScreen } from './CreateAccount'
 import { DetailsScreen } from './Home'
 import { LoggedInHome, NotLoggedInHome } from './Home'
@@ -49,7 +50,7 @@ class HomeHeader extends React.Component {
 class HomeScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         drawerLabel: () => null,
-        headerTitle: ( 
+        headerTitle: (
             <Text style={{paddingLeft:35,fontWeight: 'bold', color: '#fff', fontSize:22}}>Home</Text>
         ),
         headerLeft: (
@@ -124,7 +125,9 @@ class HomeScreen extends React.Component {
 
   render() {
       if(!this.state.ready){
-          return null; // wait until a session response has been returned
+        return (
+            <LoadingSpinner/>
+        )
       }
     return (
         <View style={{ flex: 1}}>

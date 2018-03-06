@@ -27,22 +27,24 @@ export class NotLoggedInHome extends React.Component {
     return(
         <View style={{flex: 1,  marginHorizontal: 20, marginVertical: 10, backgroundColor: '#fff', justifyContent:'center'}}>
 
-          <Text style={[{marginTop: 10}, styles.titleText]}>Welcome to Scope Calendar!</Text>
+          <Text style={[{marginBottom: 10}, styles.TextTitle]}>Welcome to Scope Calendar!</Text>
 
           <View style={styles.FlexBoxContainerEvenRowSpacing}>
             <View style={styles.FlexBoxRowElement}>
-              <Text style={{textAlign:'center'}}>Get started by creating an account.</Text>
+              <Text style={{height:50, textAlign:'center'}}>Get started by creating an account.</Text>
               <Button
                 title="Sign Up"
                 onPress={() => this.props.navigation.navigate('CreateAccount')}
+                color= {'#6b52ae'}
               />
             </View>
 
             <View style={styles.FlexBoxRowElement}>
-              <Text style={{textAlign:'center'}}>Existing user? Log in to access your calendar.</Text>
+              <Text style={{height:50, textAlign:'center'}}>Existing user? Log in to access your calendar.</Text>
               <Button
                 title="Login"
                 onPress={() => this.props.navigation.navigate('Login')}
+                color= {'#6b52ae'}
               />
             </View>
 

@@ -4,6 +4,9 @@ package scopeCalendar.controllers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -22,7 +25,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import scopeCalendar.models.CompoundModels.CreateAccountCM;
+import scopeCalendar.models.CompoundModels.*;
+import scopeCalendar.models.Event;
+import scopeCalendar.models.Organization;
 import scopeCalendar.models.User;
 import scopeCalendar.repos.UserRepository;
 import scopeCalendar.services.IUserService;
@@ -113,6 +118,21 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(user);
 	}
 	
+	
+	
+	@PostMapping(value = {"/user/getevents"}, produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> UserEventList(Model model) {
+		String error = "";
+		User user = userRepository.findByUsernameIgnoreCase(SecurityContextHolder.getContext().getAuthentication().getName());
+		
+		List<Organization> subbedOrgs = new LinkedList<Organization>(user.getSubscribedOrganizations());
+		List<Set<Event>> subscribedEvents = new LinkedList<>();
+		for(Organization org : subbedOrgs) {
+			subscribedEvents.add(org.getEvents());
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(subscribedEvents);
+	}
 	
 	@GetMapping(value ={"/LoginAuth"}, produces = "application/json")
 	@ResponseBody
