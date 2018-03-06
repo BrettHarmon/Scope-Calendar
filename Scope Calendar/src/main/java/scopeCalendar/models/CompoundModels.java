@@ -33,9 +33,29 @@ public class CompoundModels {
 			return organization;
 		}
 
-		public void setUser(Organization organization) {
-			this.organization = organization;
+
+		
+	}
+	
+	public static class CreateEventCM {
+		@Valid
+		public Event event;
+		public String startDate;
+		public String endDate;
+		public long organizationId;
+		public Event getEvent() {
+			return event;
 		}
+		public String getStartDate() {
+			return startDate;
+		}
+		public String getEndDate() {
+			return endDate;
+		}
+		public long getOrganizationId( ) {
+			return organizationId;
+		}
+
 		
 	}
 

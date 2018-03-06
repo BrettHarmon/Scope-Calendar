@@ -18,6 +18,7 @@ import { LoginScreen } from './Login'
 import { OrganizationProfileScreen} from "./Organization";
 import {CreateOrganizationScreen} from "./CreateOrganization";
 import {OrganizationListScreen} from "./OrganizationList";
+import {CreateEventScreen} from "./CreateEvent";
 
 
 /*
@@ -38,13 +39,13 @@ class HomeHeader extends React.Component {
     constructor(props) {
         super(props);
     }
-  render() {
-    return (
-        <View style={{flexWrap: 'wrap',alignItems: 'flex-start',flexDirection:'row', justifyContent: 'center',alignItems: 'center', margin:10}}>
-           <Text style={{paddingLeft:35,fontWeight: 'bold', color: '#fff', fontSize:22}}>Home</Text>
-       </View>
-    );
-  }
+    render() {
+        return (
+            <View style={{flexWrap: 'wrap',alignItems: 'flex-start',flexDirection:'row', justifyContent: 'center',alignItems: 'center', margin:10}}>
+                <Text style={{paddingLeft:35,fontWeight: 'bold', color: '#fff', fontSize:22}}>Home</Text>
+            </View>
+        );
+    }
 }
 
 class HomeScreen extends React.Component {
@@ -68,12 +69,12 @@ class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-         this.state = {
-             username : '',
-             userId   : '',
-             ready: false
-         };
-         DeviceEventEmitter.addListener('refreshHome', (e)=>{
+        this.state = {
+            username : '',
+            userId   : '',
+            ready: false
+        };
+        DeviceEventEmitter.addListener('refreshHome', (e)=>{
             this.buildCookies(e);
         });
     }
@@ -93,49 +94,49 @@ class HomeScreen extends React.Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-               "Content-type": "application/x-www-form-urlencoded",
+                "Content-type": "application/x-www-form-urlencoded",
             },
         })
-        .then((response) => {
-           return response.json().then(function (json) {
-                username = json.username;
-                if(username == 'anonymousUser'){ //ran in debug with all authentication allowed
-                    return null;
-                }
-                return json.username;
-            })
-        }).catch((error) => {
-            console.log('Error with userInfoFetch');
+            .then((response) => {
+                return response.json().then(function (json) {
+                    username = json.username;
+                    if(username == 'anonymousUser'){ //ran in debug with all authentication allowed
+                        return null;
+                    }
+                    return json.username;
+                })
+            }).catch((error) => {
+                console.log('Error with userInfoFetch');
+            });
+    }
+
+    //will rebuild login cookies and refresh homescreen with setState()
+    buildCookies(props){
+        /*let info = '';
+        Keychain.getGenericPassword()
+        .then(function(credentials) {info = credentials.username})
+        .catch(function(error) {
+            info = '';
+        });*/
+        this.setState({
+            username : props,
         });
     }
 
-     //will rebuild login cookies and refresh homescreen with setState()
-     buildCookies(props){
-         /*let info = '';
-         Keychain.getGenericPassword()
-         .then(function(credentials) {info = credentials.username})
-         .catch(function(error) {
-             info = '';
-         });*/
-         this.setState({
-            username : props,
-        });
-     }
 
-
-  render() {
-      if(!this.state.ready){
+    render() {
+        if(!this.state.ready){
+                    return (
+                            <LoadingSpinner/>
+                        )
+        }
         return (
-            <LoadingSpinner/>
-        )
-      }
-    return (
-        <View style={{ flex: 1}}>
-        {this.HomeGreeting()}
+            <View style={{ flex: 1}}>
+                {this.HomeGreeting()}
 
-        </View>
-    );
-  }
+            </View>
+        );
+    }
 
 
     //Decides if a user is logged in or not
@@ -157,65 +158,69 @@ class HomeScreen extends React.Component {
 }
 
 const RootStack = StackNavigator(
-  {
-    Home: {
-      screen: HomeScreen,
+    {
+        Home: {
+            screen: HomeScreen,
+        },
+        Details: {
+            screen: DetailsScreen,
+        },
+        CreateAccount: {
+            screen: CreateAccountScreen,
+        },
+        Created: {
+            screen: LoggedInHome,
+        },
+        Login: {
+            screen: LoginScreen,
+        },
+        CreateOrganization: {
+            screen: CreateOrganizationScreen,
+        },
+        TestOrganizationProfile :{
+            screen: OrganizationProfileScreen
+        },
+        OrganizationList: {
+            screen: OrganizationListScreen
+        },
+        CreateEvent: {
+            screen: CreateEventScreen
+        }
     },
-    Details: {
-      screen: DetailsScreen,
-    },
-    CreateAccount: {
-        screen: CreateAccountScreen,
-    },
-    Created: {
-        screen: LoggedInHome,
-    },
-    Login: {
-        screen: LoginScreen,
-    },
-    CreateOrganization: {
-        screen: CreateOrganizationScreen,
-    },
-    TestOrganizationProfile :{
-       screen: OrganizationProfileScreen
-    },
-    OrganizationList: {
-        screen: OrganizationListScreen
+    {
+        initialRouteName: 'Home',
+        navigationOptions: {
+            headerStyle: {
+                backgroundColor: '#6b52ae',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+                fontWeight: 'bold',
+            },
+        },
     }
-  },
-  {
-    initialRouteName: 'Home',
-    navigationOptions: {
-     headerStyle: {
-       backgroundColor: '#6b52ae',
-     },
-     headerTintColor: '#fff',
-     headerTitleStyle: {
-       fontWeight: 'bold',
-     },
- },
-  }
 );
 
 // slideable sidebar
 const Drawer = DrawerNavigator({
-    Stack: {
-      screen: RootStack,
+        Stack: {
+            screen: RootStack,
+        },
+        //TestOrganizationProfile :{
+        //    screen: OrganizationProfileScreen
+        //},
+        Details: {
+            screen: DetailsScreen,
+        },
+        //CreateAccount: {
+        //    screen: CreateAccountScreen,
+        //},
     },
-    //TestOrganizationProfile :{
-    //    screen: OrganizationProfileScreen
-    //},
-    Details: {
-          screen: DetailsScreen,
-    },
-    //CreateAccount: {
-    //    screen: CreateAccountScreen,
-    //},
-},
-{
-  drawerWidth: () =>  {return (Dimensions.get('window').width * .75)},
+    {
+        drawerWidth: () =>  {return (Dimensions.get('window').width * .75)},
 
 
-})
+    })
 
 export default Drawer;
+

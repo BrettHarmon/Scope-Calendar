@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import scopeCalendar.models.CompoundModels.CreateEventCM;
 import scopeCalendar.models.CompoundModels.CreateOrganizationCM;
 import scopeCalendar.models.CompoundModels.OrganizationRespone;
 import scopeCalendar.models.CompoundModels.SimpleId;
@@ -65,7 +69,25 @@ public class OrganizationController {
 		userInput.getOrganization().setSubbedUsers(new HashSet<User>());
 		userInput.getOrganization().setEvents(new HashSet<Event>());
 		userInput.getOrganization().addSubscriber(user);
+		
+		//create dummy event for now
+		Event event = new Event();
+		event.setName("Example event");
+		event.setDescription("This is just an example event. Soon you can add more!");
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+		DateTime startDate = formatter.parseDateTime("2018/03/09 01:00:00");
+		DateTime endDate = formatter.parseDateTime("2018/03/09 05:00:00");
+		event.setStartDate(startDate);
+		event.setEndDate(endDate);
+		event.setTimezoneOffset();
+		// you have to call save twice, once to give the organization and Id, and again to save the event
 		organizationRepository.save(userInput.getOrganization());
+		Organization organization = organizationRepository.findByName(userInput.getOrganization().getName());
+		event.setOrganization(organization);
+		organization.getEvents().add(event);
+		organizationRepository.save(organization);
+		eventRepository.save(event);
+		
 		
 		// create the set in user if it is null
 		if (user.getOwnedOrganizations() == null) {
@@ -78,8 +100,53 @@ public class OrganizationController {
 		user.getSubscribedOrganizations().add(userInput.getOrganization());
 		user.getOwnedOrganizations().add(userInput.getOrganization());
 	    userRepository.save(user);
+	   
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(userInput);
+		return ResponseEntity.status(HttpStatus.CREATED).body(organization);
+		
+		
+	}
+	
+	@PostMapping(value = {"event/create"}, produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> createEvent(@RequestBody CreateEventCM userInput, UriComponentsBuilder ucb, 
+									Model model) {
+		String error = "";
+		// Date time conversion
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss a");
+		System.out.println(userInput.startDate);
+		DateTime startDate = formatter.parseDateTime(userInput.startDate);
+		DateTime endDate = formatter.parseDateTime(userInput.endDate);
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		// check if user is the owner (later change to has permission)
+		Organization organization = organizationRepository.findOne(userInput.getOrganizationId());
+		System.out.println(userInput.getOrganizationId());
+		if (user == null) {
+			System.out.println("heytherecowboy");
+			
+		}
+		if (organization.getOwner().getUserId() != user.getUserId()) {
+			error = "You do not have permission to do that";
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+		}
+		//set fields then save
+		userInput.getEvent().setEndDate(endDate);
+		userInput.getEvent().setStartDate(startDate);
+		userInput.getEvent().setTimezoneOffset();
+		//saving an organization has to happen first for some reason
+		//if there are no events in an organization previously, initialize the set, then add the event and save
+		if (organization.getEvents() == null) {
+		organization.setEvents(new HashSet<Event>());
+		}
+		organization.getEvents().add(userInput.getEvent());
+		organizationRepository.save(organization);
+		userInput.getEvent().setOrganization(organizationRepository.findByName(organization.getName()));
+		eventRepository.save(userInput.getEvent());
+		
+
+		
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(userInput.getEvent());
 		
 		
 	}
