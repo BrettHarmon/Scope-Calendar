@@ -15,7 +15,11 @@ public class Organization implements Serializable {
 	private static final long serialVersionUID = -5513950805803868005L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(initialValue=1000, 
+						    allocationSize=1,
+						    name = "identity_sequence", 
+						    sequenceName="identity_sequence")
+	@GeneratedValue(generator="identity_sequence")
 	@Column(name = "organizationId")
 	private long organizationId;
 	

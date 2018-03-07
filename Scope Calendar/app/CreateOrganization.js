@@ -13,7 +13,7 @@ export class CreateOrganizationScreen extends React.Component {
     };
     render() {
         return (
-            <View>
+            <View style={styles.container}>
                 <CreateOrganizationBox navigation={this.props.navigation}/>
             </View>
         );
@@ -59,7 +59,10 @@ class CreateOrganizationBox extends React.Component {
 
                         // for now just going back to homepage. checked to see if it worked on backend
                         //that.props.navigation.navigate('OrganizationProfile', {organization: json.organization.organizationId, nagivation: that.props.navigation});
-                            that.props.navigation.popToTop();
+                        that.props.navigation.popToTop();
+                        that.props.navigation.navigate('TestOrganizationProfile', {
+                            OrganizationId: json.organizationId
+                        });
                     });
                 }
             }))

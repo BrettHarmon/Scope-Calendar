@@ -1,20 +1,23 @@
 import React from 'react';
-import {StyleSheet, Dimensions, ScrollView, TouchableOpacity, Button, Text, View, Alert, AsyncStorage} from 'react-native';
+import {
+    StyleSheet, Dimensions, ScrollView, TouchableOpacity, Button, Text, View, Alert, AsyncStorage,
+    DeviceEventEmitter
+} from 'react-native';
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
 import * as Settings from './Settings.js' //Include on every page
-var styles = require('./Styles.js');    
+var styles = require('./Styles.js');
 
 export class OrganizationProfileScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         const {state} = navigation;
         let defaultTitle = 'Organization Profile'
         return {
-           title: typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? defaultTitle: navigation.state.params.title,
+            title: typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? defaultTitle: navigation.state.params.title,
         };
-      };
-    
+    };
+
 
     constructor(props){
         super(props);
@@ -44,28 +47,52 @@ class OrganizationProfile extends React.Component {
             upcomingEvents: {},
             selected: null,
         };
+
+
     }
 
     componentWillMount(){
         this.getOrganization(this.props.Id)
-        .then((org) => {
-            if (!!org){ //org object exists (not undefined/null/empty string)
-                this.props.navigation.setParams({ title: org.name });
-                this.setState({
-                    name: org.name,
-                    subscribed: org.isSubbed,
-                    description: org.description,
-                    ready: true,
-                    subscribers: org.subs,
-                    upcomingEvents: org.upcomingEvents,
-                    selected: org.firstEvent
-                });
-            }else{
-                this.setState({ ready: true });
-            }
-        })
+            .then((org) => {
+                if (!!org){ //org object exists (not undefined/null/empty string)
+                    this.props.navigation.setParams({ title: org.name });
+                    this.setState({
+                        name: org.name,
+                        subscribed: org.isSubbed,
+                        description: org.description,
+                        ready: true,
+                        subscribers: org.subs,
+                        upcomingEvents: org.upcomingEvents,
+                        selected: org.firstEvent
+                    });
+                }else{
+                    this.setState({ ready: true });
+                }
+            })
     }
-    
+
+    componentDidMount() {
+        DeviceEventEmitter.addListener('refreshOrganization', (e)=>{
+            this.getOrganization(this.props.Id)
+        .then((org) => {
+                if (!!org){ //org object exists (not undefined/null/empty string)
+                    this.props.navigation.setParams({ title: org.name });
+                    this.setState({
+                        name: org.name,
+                        subscribed: org.isSubbed,
+                        description: org.description,
+                        ready: true,
+                        subscribers: org.subs,
+                        upcomingEvents: org.upcomingEvents,
+                        selected: org.firstEvent
+                    });
+                }else{
+                    this.setState({ ready: true });
+                }
+            })
+        });
+    }
+
     getOrganization(id){
         return fetch( Settings.HOME_URL + '/organization/info', {
             method: 'POST',
@@ -77,55 +104,55 @@ class OrganizationProfile extends React.Component {
                 Id: id
             })
         })
-        .then((response) => {
-            if(!response.ok){
-                return null;
-            }
-            return response.json().then(function (json) {
-                //Load upcoming events
-                var events = {};
-                var today = new Date();
+            .then((response) => {
+                if(!response.ok){
+                    return null;
+                }
+                return response.json().then(function (json) {
+                    //Load upcoming events
+                    var events = {};
+                    var today = new Date();
 
-                for (let i = -3; i < 31; i++) {
-                    let time = today.getTime() + i * 24 * 60 * 60 * 1000;
-                    let strTime = Settings.timeToString(time);
-                    events[strTime] = [];
-                  }
-
-                var firstDay = new Date(8640000000000000);  //Set as max possible date
-                json.events.forEach((element) => {
-                    //get day(as string) eg: '2018-03-15'
-                    let startDateMils = element.startDate.millis;
-                    let strTime = Settings.timeToString(startDateMils);
-                    
-                    //get earliest event (in future)
-                    if(firstDay.getTime() >  startDateMils && startDateMils > today.getTime()){
-                        firstDay = new Date(startDateMils);
+                    for (let i = -3; i < 31; i++) {
+                        let time = today.getTime() + i * 24 * 60 * 60 * 1000;
+                        let strTime = Settings.timeToString(time);
+                        events[strTime] = [];
                     }
 
-                    //Timezone offset
-                    let offset = element.timezoneOffset;
+                    var firstDay = new Date(8640000000000000);  //Set as max possible date
+                    json.events.forEach((element) => {
+                        //get day(as string) eg: '2018-03-15'
+                        let startDateMils = element.startDate.millis;
+                        let strTime = Settings.timeToString(startDateMils);
 
-                    events[strTime].push({
-                        event: element.name,
-                        description: element.description,
-                        start : new Date(element.startDate.millis + (offset * 3600 * 1000) ),
-                        end : new Date(element.endDate.millis + (offset * 3600 * 1000)),
+                        //get earliest event (in future)
+                        if(firstDay.getTime() >  startDateMils && startDateMils > today.getTime()){
+                            firstDay = new Date(startDateMils);
+                        }
+
+                        //Timezone offset
+                        let offset = element.timezoneOffset;
+
+                        events[strTime].push({
+                            event: element.name,
+                            description: element.description,
+                            start : new Date(element.startDate.millis + (offset * 3600 * 1000) ),
+                            end : new Date(element.endDate.millis + (offset * 3600 * 1000)),
+                        });
                     });
-                });
-                let result = {};
-                result.name = json.name;
-                result.description = json.description;
-                result.isSubbed = json.isSubscribed== 'true';
-                result.subs = parseInt(json.subscribers, 10);
-                result.upcomingEvents = events;
-                result.firstEvent = new Date(Settings.timeToString(firstDay.getTime()));
-               return result;
+                    let result = {};
+                    result.name = json.name;
+                    result.description = json.description;
+                    result.isSubbed = json.isSubscribed== 'true';
+                    result.subs = parseInt(json.subscribers, 10);
+                    result.upcomingEvents = events;
+                    result.firstEvent = new Date(Settings.timeToString(firstDay.getTime()));
+                    return result;
+                })
             })
-        })
-        .catch((err) => {
-            console.error('fetchOrganization Error caught: ',err);
-        });
+            .catch((err) => {
+                console.error('fetchOrganization Error caught: ',err);
+            });
     }
 
     OrganizationSub(){
@@ -142,28 +169,28 @@ class OrganizationProfile extends React.Component {
         }).then((response) => {
             if(response.ok){
                 response.json().then(function (responseBody) {
-                   if(responseBody.subbed == 'true'){
+                    if(responseBody.subbed == 'true'){
                         //new subscriber!
                         that.setState({
                             subscribed: true,
                             subscribers: that.state.subscribers + 1,
                         });
-                   }else{
-                       // unsubscriber :(
+                    }else{
+                        // unsubscriber :(
                         that.setState({
                             subscribed: false,
                             subscribers: that.state.subscribers - 1,
                         });
-                   }
+                    }
                 });
             }
             else{
                 alert('Problem subscribing to '+that.state.name+'.');
             }
         })
-        .catch((err) => {
-            console.error('OrganizationSub() Error caught: ',err);
-        });
+            .catch((err) => {
+                console.error('OrganizationSub() Error caught: ',err);
+            });
     }
 
     SubscribeButton(){
@@ -171,15 +198,15 @@ class OrganizationProfile extends React.Component {
             //Display a subscribed button
             return(
                 <TouchableOpacity style={styles.SubscribeButton}
-                    onPress={() => {Alert.alert(
-                        'Unsubscribe',
-                        'Are you sure you want to unsubscribe from '+this.state.name+ '?',
-                        [
-                        {text: 'Cancel', style: 'cancel'},
-                        {text: 'OK', onPress: () => {this.OrganizationSub()}},
-                        ],
-                        { cancelable: true }
-                    )}}>
+                                  onPress={() => {Alert.alert(
+                                      'Unsubscribe',
+                                      'Are you sure you want to unsubscribe from '+this.state.name+ '?',
+                                      [
+                                          {text: 'Cancel', style: 'cancel'},
+                                          {text: 'OK', onPress: () => {this.OrganizationSub()}},
+                                      ],
+                                      { cancelable: true }
+                                  )}}>
                     <Text style={{color:'#fff'}} >Subscribed</Text>
                     <Iconz name="md-checkmark" style={{paddingLeft: 5}} color ="#fff" size={20}/>
                 </TouchableOpacity>
@@ -197,6 +224,8 @@ class OrganizationProfile extends React.Component {
         if(!this.state.ready){
             return null;
         }
+        console.log(this.props.Id);
+        let that = this;
         var yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         var wide = Dimensions.get('window').width;
@@ -212,6 +241,9 @@ class OrganizationProfile extends React.Component {
                 <View style={styles.hr}/>
                 <View>
                     <Text style ={[styles.TextTitle, {textDecorationLine: 'underline'}]}> Upcoming Events </Text>
+                    <TouchableOpacity  onPress={() => that.props.navigation.navigate('CreateEvent', {Id : that.props.Id})}>
+                        <Iconz name="md-add" color ="black" size={28} style={{marginRight: 20}}/>
+                    </TouchableOpacity>
                 </View>
 
                 <Agenda
@@ -231,7 +263,7 @@ class OrganizationProfile extends React.Component {
                         dotColor: '#6b52ae',
                         selectedDotColor: '#ffffff',
                         agendaKnobColor: '#6b52ae'
-                      }}
+                    }}
                 />
             </View>
         );
@@ -244,12 +276,12 @@ class OrganizationProfile extends React.Component {
         return (
             <View style={[styles.agendaItem, {height: setHeight}]}>
                 <Text style={{fontSize:16,  fontWeight: 'bold'}}>{item.event}</Text>
-               <Text style={{fontSize:14, fontWeight: 'bold'}}> {item.start.neatTime()} - {item.end.neatTime()} </Text>
-               <Text>{item.description}</Text>
+                <Text style={{fontSize:14, fontWeight: 'bold'}}> {item.start.neatTime()} - {item.end.neatTime()} </Text>
+                <Text>{item.description}</Text>
             </View>
         );
     }
 
-    
+
 }
 

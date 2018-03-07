@@ -72,8 +72,7 @@ class LoginBox extends React.Component {
             }) 
             
             .catch((err) => {
-                that.setState({error: err});
-                console.error(err);
+                that.setState({error: err.message});
             })
         );
     }

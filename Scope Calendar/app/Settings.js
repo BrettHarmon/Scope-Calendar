@@ -1,4 +1,4 @@
-export const HOME_URL = "http://127.0.0.1:8080" //This is your computer IP, add to gitIgnore
+export const HOME_URL = "http://10.128.65.67:8080" //This is your computer IP, add to gitIgnore
 
  Number.prototype.numberWithCommas = function () {
     var parts = this.toString().split(".");

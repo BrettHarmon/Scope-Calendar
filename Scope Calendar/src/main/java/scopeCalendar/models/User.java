@@ -37,7 +37,11 @@ public class User implements Serializable {
 	private String username;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(initialValue=1000, 
+						     allocationSize=1,
+						     name = "identity_sequence", 
+						     sequenceName="identity_sequence")
+	@GeneratedValue(generator="identity_sequence")
 	@Column(name = "userId")
 	private long userId;
 	
@@ -53,8 +57,12 @@ public class User implements Serializable {
 	public Set<Organization> getOwnedOrganizations() {
 		return orgs;
 	}
-	
-	
+
+	public void setOrgs(Set<Organization> orgs) {
+		this.orgs = orgs;
+	}
+
+
 	public User(){
 
 	}

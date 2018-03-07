@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -28,7 +29,11 @@ public class Event implements Serializable {
     private static final long serialVersionUID = 3257654234123443123L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(initialValue=1000, 
+						    allocationSize=1,
+						    name = "identity_sequence", 
+						    sequenceName="identity_sequence")
+    @GeneratedValue(generator="identity_sequence")
     @Column(name = "eventId")
     private long eventId;
 

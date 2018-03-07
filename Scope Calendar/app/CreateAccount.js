@@ -105,6 +105,7 @@ class LoginBox extends React.Component {
         return (
             <ScrollView style={styles.bodyView} >
                 <Text style={{color: "#d10000", textAlign: 'center'}}>{this.state.generalErr}</Text>
+
                 <View style= {styles.InputSpan}>
                     <Text style= {styles.TInputLabel}>Username</Text>
                     <TextInput
