@@ -4,7 +4,7 @@ import React from 'react';
 import { StyleSheet} from 'react-native';
 
 
-var purp = '#6b52ae';
+export const purple = '#6b52ae';
 module.exports = StyleSheet.create({
 
     //FlexBox styling
@@ -20,9 +20,24 @@ module.exports = StyleSheet.create({
     },
     //
 
+    calendar: {
+        borderTopWidth: 1,
+        paddingTop: 5,
+        borderBottomWidth: 1,
+        borderColor: '#eee',
+        height: 350
+    },
+    text: {
+        textAlign: 'center',
+        borderColor: '#bbb',
+        padding: 10,
+        backgroundColor: '#eee'
+    },
+
+
     SubscribeButton:{
         borderRadius: 6,
-        backgroundColor: purp,
+        backgroundColor: purple,
         paddingHorizontal: 10,
         paddingVertical: 10,
         marginVertical: 5,
