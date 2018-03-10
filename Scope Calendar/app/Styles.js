@@ -10,11 +10,11 @@ module.exports = StyleSheet.create({
     //FlexBox styling
     FlexBoxContainerEvenRowSpacing: {
         flexWrap: 'wrap',
-        flexDirection:'row', 
+        flexDirection:'row',
         justifyContent:'space-around'
     },
     FlexBoxRowElement: {
-        flex:1, 
+        flex:1,
         flexWrap: 'wrap',
         paddingHorizontal: 3
     },

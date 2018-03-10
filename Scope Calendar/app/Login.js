@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, Button, DeviceEventEmitter } from 'r
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
 
+var utility = require('./fnUtils.js');
 import * as Settings from './Settings.js' //Include on every page
 var styles = require('./Styles.js');
 var Storage = require('./IStorage.js');
@@ -69,8 +70,8 @@ class LoginBox extends React.Component {
                 else{
                     that.setState({error: "Could not find account with that username/email and password."});
                 }
-            }) 
-            
+            })
+
             .catch((err) => {
                 that.setState({error: err.message});
             })

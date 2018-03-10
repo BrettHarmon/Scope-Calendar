@@ -3,6 +3,7 @@ import {TouchableOpacity, StyleSheet, ScrollView, Text, View, TextInput, Button,
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
 
+var utility = require('./fnUtils.js');
 import * as Settings from './Settings.js' //Include on every page
 var styles = require('./Styles.js');
 

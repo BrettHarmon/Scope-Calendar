@@ -2,107 +2,236 @@
 import React from 'react';
 import {Button, Dimensions, ScrollView, Text, View, AsyncStorage} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import update from 'immutability-helper';
 
 var styles = require('./Styles.js');
+var utility = require('./fnUtils.js');
 import * as Settings from './Settings.js'
+
+import { LoadingSpinner } from './components/loadingSpinner.js'
+
 export class DetailsScreen extends React.Component {
   constructor(props){
     super(props);
-    this.state = {};
+    this.state = {
+        ready: false,
+        calendarData: {},
+        selected: null,
+    };
+    this.colors = ['#00FFFF','#8B008B','#FFA500','springgreen','darkslateblue','seagreen','brown','darkgray','olive','deeppink'];
   }
+
+  componentWillMount(){
+      this.UserEventFetch()
+          .then((evts) => {
+              if (utility.hasValue(evts)){ //evts object exists (not undefined/null/empty string)
+                var parsedEvents =  this.parseEvents(evts);
+                //console.log('event state: \n',parsedEvents);
+                this.setState({
+                    ready:true,
+                    calendarData: parsedEvents,
+                });
+
+            }else{
+                console.log('No events returned from userEventFetch')
+            }
+          })
+  }
+
   render() {
-    this.parseEvents([]);
+      if(!this.state.ready){
+          return (<LoadingSpinner/>)
+      }
+
     let today = new Date();
     var high = Math.floor(Dimensions.get('window').height * 0.65);
     return (
       <View style={styles.bodyView}>
         <View style={[styles.container, {borderWidth: 2, borderColor: '#6b52ae', borderRadius: 6}]}>
           <CalendarList
+              markedDates={ this.state.calendarData }
+              //markedDates={{[this.state.selected]: {selected: true, disableTouchEvent: true, selectedColor: '#6b52ae'}}}
               onDayPress={this.onDayPress.bind(this)}
               pastScrollRange={today.getMonth()} //Cant scroll past this year
-              markedDates={{[this.state.selected]: {selected: true, disableTouchEvent: true, selectedColor: '#6b52ae'}}}
               markingType={'multi-dot'}
+              showScrollIndicator={true}
+              displayLoadingIndicator= {true}
               theme={{
                 todayTextColor: '#6b52ae',
                 selectedDayBackgroundColor: '#6b52ae',
+                selectedDotColor: '#ffffff',
               }}
             />
           </View>
 
           <View style={styles.hr} />
 
-          <ScrollView style={[styles.calendar, {paddingHorizontal: 15, paddingVertical:10, height: high}]}>
-            <Text>.</Text>
+          <ScrollView style={{padding:15}}>
+                {this.DayEvents()}
           </ScrollView>
       </View>
-      
+
     );
   }
 
-  //pass events as array or objects containing .name and .events as array of dates
-  parseEvents(events){
-    const colors = ['cyan','DarkMagenta','orange','springgreen','darkslateblue','seagreen','brown','darkgray','olive','deeppink'];
-    let today = new Date();
-    
-    let data = {};
-    //initialize all events with empty array for next 3 months
-    for (let i = -7; i < 90; i++) {
-      let time = today.getTime() + i * 24 * 60 * 60 * 1000;
-      let strTime = Settings.timeToString(time);
-      data[strTime] =  {dots:  [], events: {} };  
-    }
+  DayEvents(){
+      var day = this.state.selected;
+      console.log(this.state.calendarData[day])
+      if(this.state.selected == null){
+          return (
+              <View>
+                <Text style={styles.TextTitle}> Select a day on the calendar to see events </Text>
+              </View>
+          )
+      }
+      // no events, nothing to be rendered TODO: Check 'hidden' organizations
+      if(!this.state.calendarData[day].events){
+            return(
+                <View>
+                  <Text style={[styles.TextTitle, {marginBottom: 10}]}>There are no events on {this.state.selected}.</Text>
+                </View>
+            )
+      }
 
-    events.forEach((orgEvts, idx) => {
-      let name = orgEvts.name;
-      let orgInfo = {key:name, color: colors[idx]};
-      orgEvts.forEach((event) => {
-        let dayKey = new Date(event.startDate.millis).UTCToString();
-        let dataDots = data[dayKey].dots;
-        if(!dataDots.filter(dots => dots.key == name)){
-          //could not find an event by same organization on this day
-          data[dataKey].dots.push(orgInfo);
-        }
-        if(!data[dataKey].events[name]){
-          data[dataKey].events[name] = [];
-        }
-        data[dataKey].events[name].push({
-          event: event.name,
-          description: event.description,
-          start : new Date(event.startDate.millis),
-          end : new Date(event.endDate.millis),
+      return (
+          <View>
+            <Text style={[styles.TextTitle, {marginBottom: 10}]}>Events for {this.state.selected}</Text>
+
+            {Object.getOwnPropertyNames(this.state.calendarData[day].events).map((org, i) =>
+                this.OrgEventList(org, i)
+            )}
+
+          </View>
+      )
+  }
+  OrgEventList(name, i){
+      var backgroundColor = this.state.calendarData[this.state.selected].dots.find(dots => dots.key == name).color;
+      let childBG = backgroundColor + '66' //Add a .4 opacity
+      backgroundColor += 'A6' //Add a .65 opacity
+      return (
+          <View key={i} style={{paddingHorizontal: 20, borderRadius: 7, borderWidth: 1.5, backgroundColor: backgroundColor}}>
+              <Text style= {{textAlign:'center', fontSize:20, paddingVertical: 10}}>{name}</Text>
+              {this.state.calendarData[this.state.selected].events[name].map((evt, j) =>
+                  this.EventItem(evt,j,childBG)
+                )}
+          </View>
+
+      )
+  }
+  EventItem(evt, i, background){
+      return (
+          <View key={i+100} style={{backgroundColor: background, padding:10, marginVertical: 8}}>
+            <Text style={{fontSize:18, fontWeight: 'bold'}}>Event: {evt.event}</Text>
+            <Text style={{fontSize:14, fontWeight: 'bold'}} >{evt.start.neatTime()} - {evt.end.neatTime()} </Text>
+            <Text numberOfLines={10}> {evt.description}</Text>
+          </View>
+      )
+  }
+
+  UserEventFetch(){
+      return fetch( Settings.HOME_URL + '/user/getevents', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+        })
+          .then((response) => {
+              if(response.ok) {
+                  return response.json().then(function (body) {
+                      //console.log(body);
+                      return body;
+                    })
+                }
+              return null;
+          }).catch((error) => {
+              console.log('Error with UserEventFetch');
+          });
+  }
+
+  /** pass events as array or objects containing .name and .events as array of dates
+  /     So... a object passed here (directly from user/getevents) looks like
+  /    Obj : {
+            Organization1: Array [
+                Obj : {
+                        event_1: ... (Event object direct from backend)
+                        event_2: ...
+                    }
+            ]
+            Organization2: Array [
+                ...
+            ]
+      }
+  */
+  parseEvents(events){
+    let today = new Date();
+
+    let data = {};
+    Object.getOwnPropertyNames(events).forEach((orgs, idx) => {
+        var orgName = orgs;
+        let orgInfo = {key:orgName, color: this.colors[idx], colorIndex: idx};
+
+        events[orgName].forEach((event) => {
+            let dayKey = new Date(event.startDate.millis).UTCToString();
+            // initialize data object element
+            if(!data[dayKey]){
+                data[dayKey] = { dots: [], events: {}};
+            }
+            // initialize event array if not
+            if(!data[dayKey].events[orgName]){
+              data[dayKey].events[orgName] = [];
+            }
+
+            // Store org marking info if not there prior
+            if(!data[dayKey].dots.find(dots => dots.key == orgName)){
+              data[dayKey].dots.push(orgInfo);
+            }
+
+            data[dayKey].events[orgName].push({
+              event: event.name,
+              description: event.description,
+              start : new Date(event.startDate.millis),
+              end : new Date(event.endDate.millis),
+            });
         });
-      });
-    }); 
-    console.log(data);
-    //TODO set state;
+    });
     return data;
   }
 
   onDayPress(day) {
-    this.setState({
-      selected: day.dateString
-    });
-    console.log(day, 'selected');
+      //TODO: remove all 'selected' entries - deselect all
+      var calenderData = Object.assign({}, this.state.calendarData);
+      /*
+      Object.getOwnPropertyNames(calenderData).forEach((date) =>{
+          calenderData[date];
+          if (calenderData[date].hasOwnProperty('selected')){
+              delete calenderData[date].selected;
+          }
+      })
+
+      if ( calenderData["2018-03-15"].hasOwnProperty('selected')){
+          delete  calenderData["2018-03-15"].selected;
+          calenderData["2018-03-15"] = {};
+      }*/
+
+      //const _selectedDay = moment(day.dateString).format(_format);
+
+     let selected = true;
+     if (calenderData[day.dateString]) {
+       // Already in marked dates, so reverse current marked state
+       selected = !calenderData[day.dateString].selected;
+     }
+
+     // Create a new object using object property spread since it should be immutable
+     const updatedSelect = {...calenderData[day.dateString], ...{ selected } }
+     const updatedMarkedDates = {...this.state.calendarData, ...{ [day.dateString]:  updatedSelect  } }
+     //console.log(updatedMarkedDates);
+
+     // Triggers component to render again, picking up the new state
+     this.setState({ calendarData: updatedMarkedDates, selected: day.dateString });
+
   }
+
 
 }
-export class DayEvent extends React.Component {
-  render(){
-    return(
-      <View>
-      {Object.entries(this.props.events).map(([org, evts]) => {return this.EventList(org, evts) })}
-      </View>
-    )
-  }
 
-  EventList(org, events){
-    return(
-      <View>
-      </View>
-    )
-  }
-
-}
 export class NotLoggedInHome extends React.Component {
   constructor(props){
     super(props);
@@ -150,36 +279,14 @@ export class LoggedInHome extends React.Component {
         title: 'Home'
     }
 
-      componentWillMount(){
-          this.UserEventFetch()
-              .then((events) => {
-
-              })
-      }
-
-      UserEventFetch(){
-          return fetch( Settings.HOME_URL + '/user/getevents', {
-              method: 'POST',
-              headers: { 'Accept': 'application/json' },
-            })
-              .then((response) => {
-                  return response.json().then(function (body) {
-                      console.log(body);
-                  })
-                  return null;
-              }).catch((error) => {
-                  console.log('Error with UserEventFetch');
-              });
-      }
-
 
   render() {
-    return (
-      <View style={styles.container}>
-        {this.exprender()}
-      </View>
-       );
     /*return (
+      <View style={styles.container}>
+        //{this.exprender()}
+      </View>
+       );*/
+    return (
       <View style={{ flex: 1}}>
           <Text style= {{fontSize:20, textAlign: 'center'}}> Welcome {this.props.username}!</Text>
           <Button
@@ -225,7 +332,7 @@ export class LoggedInHome extends React.Component {
             }}
           />
       </View>
-    );*/
+    );
   }
 
   exprender(){
@@ -319,14 +426,17 @@ export class LoggedInHome extends React.Component {
             markedDates={{[this.state.selected]: {selected: true}}}
           />
         </ScrollView>
-        
+
       );
   }
+
+
 
   onDayPress(day) {
     this.setState({
       selected: day.dateString
     });
+    console.log(day, 'selected');
   }
 
 }

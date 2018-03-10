@@ -6,6 +6,7 @@ import {
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
+var utility = require('./fnUtils.js');
 import * as Settings from './Settings.js' //Include on every page
 var styles = require('./Styles.js');
 
@@ -115,7 +116,7 @@ class OrganizationProfile extends React.Component {
 
                     for (let i = -3; i < 31; i++) {
                         let time = today.getTime() + i * 24 * 60 * 60 * 1000;
-                        let strTime = Settings.timeToString(time);
+                        let strTime = utility.timeToString(time);
                         events[strTime] = [];
                     }
 
@@ -123,7 +124,7 @@ class OrganizationProfile extends React.Component {
                     json.events.forEach((element) => {
                         //get day(as string) eg: '2018-03-15'
                         let startDateMils = element.startDate.millis;
-                        let strTime = Settings.timeToString(startDateMils);
+                        let strTime = utility.timeToString(startDateMils);
 
                         //get earliest event (in future)
                         if(firstDay.getTime() >  startDateMils && startDateMils > today.getTime()){
@@ -146,7 +147,7 @@ class OrganizationProfile extends React.Component {
                     result.isSubbed = json.isSubscribed== 'true';
                     result.subs = parseInt(json.subscribers, 10);
                     result.upcomingEvents = events;
-                    result.firstEvent = new Date(Settings.timeToString(firstDay.getTime()));
+                    result.firstEvent = new Date(utility.timeToString(firstDay.getTime()));
                     return result;
                 })
             })
@@ -284,4 +285,3 @@ class OrganizationProfile extends React.Component {
 
 
 }
-
