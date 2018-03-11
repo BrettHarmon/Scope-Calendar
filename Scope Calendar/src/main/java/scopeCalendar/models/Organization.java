@@ -48,6 +48,9 @@ public class Organization implements Serializable {
 	@JsonIgnore
 	private Set<Event> events;
 	
+	@Column(name = "private")
+	private boolean isPrivate; 
+	
 	public long getOrganizationId() {
 		return organizationId;
 	}
@@ -102,5 +105,15 @@ public class Organization implements Serializable {
 	public void setEvents(Set<Event> events) {
 		this.events = events;
 	}
+	
+	public void setPrivate(boolean isPrivate)
+	{
+		this.isPrivate = isPrivate;
+	}
 
+	public boolean getPrivate()
+	{
+		return isPrivate;
+	}
+	
 }

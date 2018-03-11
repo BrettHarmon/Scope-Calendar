@@ -47,6 +47,7 @@ class OrganizationProfile extends React.Component {
             description : '',
             upcomingEvents: {},
             selected: null,
+            isPrivate: null;
         };
 
 
@@ -65,6 +66,7 @@ class OrganizationProfile extends React.Component {
                         subscribers: org.subs,
                         upcomingEvents: org.upcomingEvents,
                         selected: org.firstEvent
+                        isPrivate: org.isPrivate;
                     });
                 }else{
                     this.setState({ ready: true });
@@ -86,6 +88,7 @@ class OrganizationProfile extends React.Component {
                         subscribers: org.subs,
                         upcomingEvents: org.upcomingEvents,
                         selected: org.firstEvent
+                        isPrivate: org.isPrivate;
                     });
                 }else{
                     this.setState({ ready: true });
@@ -148,6 +151,7 @@ class OrganizationProfile extends React.Component {
                     result.subs = parseInt(json.subscribers, 10);
                     result.upcomingEvents = events;
                     result.firstEvent = new Date(utility.timeToString(firstDay.getTime()));
+                    result.isPrivate = json.isPrivate;
                     return result;
                 })
             })
@@ -195,7 +199,8 @@ class OrganizationProfile extends React.Component {
     }
 
     SubscribeButton(){
-        if(this.state.subscribed){
+    	
+        if(this.state.subscribed && !this.state.isPrivate){
             //Display a subscribed button
             return(
                 <TouchableOpacity style={styles.SubscribeButton}
@@ -212,13 +217,28 @@ class OrganizationProfile extends React.Component {
                     <Iconz name="md-checkmark" style={{paddingLeft: 5}} color ="#fff" size={20}/>
                 </TouchableOpacity>
             );
-        }else{
+        }else if (!this.state.subscribed && !this.state.isPrivate){
             return(
                 <TouchableOpacity style={styles.SubscribeButton }  onPress={() => {this.OrganizationSub()}}>
                     <Text style={{color:'#fff', fontWeight:'bold' }}>Subscribe</Text>
                 </TouchableOpacity>
             );
+         
         }
+        else 
+        	return(
+        		<TouchableOpacity style={styles.SubscribeButton }  onPress={() => {Alert.alert(
+        							'Private Organization'
+        							'You must request an invitation from the owner to subscribe to '+this.state.name + '.',
+        							[
+        								{text: 'OK', },
+        								
+        							]
+        						)}}>
+                    <Text style={{color:'#aaa', fontWeight:'bold' }}>Private</Text>
+                </TouchableOpacity>
+        	)
+        	
     }
 
     render() {
