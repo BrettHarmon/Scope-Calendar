@@ -49,7 +49,7 @@ public class Organization implements Serializable {
 	private Set<Event> events;
 	
 	@Column(name = "private")
-	private boolean isPrivate; 
+	private boolean isPrivate = false; 
 	
 	public long getOrganizationId() {
 		return organizationId;

@@ -11,15 +11,15 @@ WHERE
 NOT EXISTS (
     SELECT user_id FROM users WHERE user_id = 2
 );
-insert into organizations (organization_id, description, name, owner_id)
-Select 1, null, 'Empty Organization', 1 
+insert into organizations (organization_id, description, private, name, owner_id)
+Select 1, null, false, 'Empty Organization', 1 
 WHERE
 NOT EXISTS (  
 	SELECT organization_id FROM organizations WHERE organization_id = 1 
 );
 
-insert into organizations (organization_id, description, name, owner_id)
-Select 2, '2018 Schedule for York little league organization', 'York County T-Ball', 2 
+insert into organizations (organization_id, description, private, name, owner_id)
+Select 2, '2018 Schedule for York little league organization', false, 'York County T-Ball', 2 
 WHERE
 NOT EXISTS (  
 	SELECT organization_id FROM organizations WHERE organization_id = 2 

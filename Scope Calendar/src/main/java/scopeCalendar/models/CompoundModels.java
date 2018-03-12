@@ -74,6 +74,7 @@ public class CompoundModels {
 		String description;
 		String subscribers;
 		String isSubscribed;
+		String isPrivate;
 		List<Event> events;
 		
 		public OrganizationRespone() { }
@@ -93,6 +94,14 @@ public class CompoundModels {
 		public List<Event> getEvents() {
 			return events;
 		}
+		public String getIsPrivate() {
+			return isPrivate;
+		}
+
+		public void setIsPrivate(String isPrivate) {
+			this.isPrivate = isPrivate;
+		}
+
 		public void setName(String name) {
 			this.name = name;
 		}

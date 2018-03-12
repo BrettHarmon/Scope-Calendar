@@ -183,6 +183,7 @@ public class OrganizationController {
 		result.setName(org.getName());
 		result.setDescription(org.getDescription());
 		result.setSubscribers(String.valueOf(org.getSubbedUsers().size()));
+		result.setIsPrivate(String.valueOf(org.getPrivate()));
 		
 		//find out if user is a subscriber to organization
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -192,6 +193,15 @@ public class OrganizationController {
 		
 		List<Event> evts = new LinkedList<> (org.getEvents());
 		evts.sort(new EventTimeComparer());
+		//remove events before 'today'
+		List<Event> tobeRemoved  = new LinkedList<Event>();
+		for(Event e : evts) {
+			if (e.getStartDate().isBeforeNow() ) {
+				tobeRemoved.add(e);
+			}
+		}
+		evts.removeAll(tobeRemoved);
+		
 		result.setEvents(evts);
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
