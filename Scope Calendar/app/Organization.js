@@ -48,6 +48,7 @@ class OrganizationProfile extends React.Component {
             upcomingEvents: {},
             selected: null,
             isPrivate: null,
+            isAdmin: null,
         };
 
 
@@ -67,6 +68,7 @@ class OrganizationProfile extends React.Component {
                         upcomingEvents: org.upcomingEvents,
                         selected: org.firstEvent,
                         isPrivate: org.isPrivate,
+                        isAdmin: org.isAdmin,
                     });
                 }else{
                     this.setState({ ready: true });
@@ -89,6 +91,7 @@ class OrganizationProfile extends React.Component {
                         upcomingEvents: org.upcomingEvents,
                         selected: org.firstEvent,
                         isPrivate: org.isPrivate,
+                        isAdmin: org.isAdmin,
                     });
                 }else{
                     this.setState({ ready: true });
@@ -142,6 +145,7 @@ class OrganizationProfile extends React.Component {
                             description: element.description,
                             start : new Date(element.startDate.millis + (offset * 3600 * 1000) ),
                             end : new Date(element.endDate.millis + (offset * 3600 * 1000)),
+                            eventId: parseInt(element.Id, 10),
                         });
                     });
                     let result = {};
@@ -152,6 +156,7 @@ class OrganizationProfile extends React.Component {
                     result.upcomingEvents = events;
                     result.firstEvent = new Date(utility.timeToString(firstDay.getTime()));
                     result.isPrivate = json.isPrivate== 'true';
+                    result.isAdmin = json.isAdmin== 'true';
                     return result;
                 })
             })
@@ -257,7 +262,9 @@ class OrganizationProfile extends React.Component {
                     {this.SubscribeButton()}
                 </View>
 
-                <Text numberOfLines={5} style={{fontSize:14,  marginHorizontal: 30, marginVertical:10}}>{this.state.description}</Text>
+                <View>
+                  <Text numberOfLines={5} style={{fontSize:14,  marginHorizontal: 30, marginVertical:10}}>{this.state.description}</Text>
+                </View>
 
                 <View style={styles.hr}/>
                 <View>

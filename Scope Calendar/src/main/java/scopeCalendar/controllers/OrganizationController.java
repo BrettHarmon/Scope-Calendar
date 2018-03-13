@@ -189,6 +189,7 @@ public class OrganizationController {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		User loggedIn = userRepository.findByUsernameIgnoreCase(username);
 		result.setIsSubscribed( String.valueOf(org.getSubbedUsers().contains(loggedIn)));
+		result.setIsAdmin(String.valueOf(org.getOwner().equals(loggedIn)));
 		
 		
 		List<Event> evts = new LinkedList<> (org.getEvents());
