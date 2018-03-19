@@ -9,5 +9,5 @@ import scopeCalendar.models.Organization;
 
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
 	Organization findByName(String one);
-	//Set<Organization> findByName(String arg0);
+	Set<Organization> findByNameContaining(String arg0);
 }
