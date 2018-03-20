@@ -19,6 +19,7 @@ import { OrganizationProfileScreen} from "./Organization";
 import {CreateOrganizationScreen} from "./CreateOrganization";
 import {OrganizationListScreen} from "./OrganizationList";
 import {CreateEventScreen} from "./CreateEvent";
+import {SearchScreen} from "./Search";
 
 
 /*
@@ -185,7 +186,7 @@ const RootStack = StackNavigator(
         },
         CreateEvent: {
             screen: CreateEventScreen
-        }
+        },
     },
     {
         initialRouteName: 'Home',
@@ -211,6 +212,10 @@ const Drawer = DrawerNavigator({
         //},
         Details: {
             screen: DetailsScreen,
+        },
+
+        Search: {
+            screen: SearchScreen,
         },
         //CreateAccount: {
         //    screen: CreateAccountScreen,

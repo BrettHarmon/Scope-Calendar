@@ -190,6 +190,15 @@ public class OrganizationController {
 		
 	}
 	
+	
+	
+	/*@GetMapping({"/search/{searchBox}"})
+	public ResponseEntity<?> searchOrganizations(@PathVariable long searchBox) {
+		model.addAttribute("event", eventRepository.findOne(eventId));
+
+		return "editEvent";
+	}*/
+	
 	@GetMapping(value ={"subscribed"}, produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<?> getSubscribedOrganizations() {
