@@ -120,7 +120,7 @@ class OrganizationProfile extends React.Component {
                     var events = {};
                     var today = new Date();
 
-                    for (let i = -3; i < 31; i++) {
+                    for (let i = -30; i < 31; i++) {
                         let time = today.getTime() + i * 24 * 60 * 60 * 1000;
                         let strTime = utility.timeToString(time);
                         events[strTime] = [];

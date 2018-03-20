@@ -25,7 +25,8 @@ class SearchBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {organizations: [],
-                      searchBox: '',};
+                      searchBox: '',
+                      showResults: false,};
     }
 
     searchOrganizations() {
@@ -34,8 +35,9 @@ class SearchBox extends React.Component {
         return fetch( Settings.HOME_URL + '/organization/search/' + searchBox)
             .then((response) => response.json())
             .then((responseJson) => {
-                that.setState({organizations: responseJson});
-                // console.log(responseJson);
+                that.setState({organizations: responseJson, showResults: true});
+
+                 console.log(that.state.organizations);
             })
             .catch((error) => {
                 console.error(error);
@@ -59,7 +61,7 @@ class SearchBox extends React.Component {
             <Button title="Search Organizations" onPress={this.searchOrganizations.bind(this)} />
                 {
                     this.state.showResults &&
-                        <SearchResultsBox organizations={this.state.organizations}/>
+                        <SearchResultsBox organizations={this.state.organizations} navigation={this.props.navigation}/>
                 }
             </View>
 
@@ -72,7 +74,7 @@ class SearchBox extends React.Component {
 class SearchResultsBox extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {organizations: [],};
+        this.state = {organizations: this.props.organizations,};
     }
 
 

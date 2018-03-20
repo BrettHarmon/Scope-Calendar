@@ -69,8 +69,8 @@ public class OrganizationController {
 		event.setName("Example event");
 		event.setDescription("This is just an example event. Soon you can add more!");
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-		DateTime startDate = formatter.parseDateTime("2018/03/09 01:00:00");
-		DateTime endDate = formatter.parseDateTime("2018/03/09 05:00:00");
+		DateTime startDate = formatter.parseDateTime("2018/03/24 01:00:00");
+		DateTime endDate = formatter.parseDateTime("2018/03/24 05:00:00");
 		event.setStartDate(startDate);
 		event.setEndDate(endDate);
 		event.setTimezoneOffset();
@@ -192,12 +192,17 @@ public class OrganizationController {
 	
 	
 	
-	/*@GetMapping({"/search/{searchBox}"})
-	public ResponseEntity<?> searchOrganizations(@PathVariable long searchBox) {
-		model.addAttribute("event", eventRepository.findOne(eventId));
-
-		return "editEvent";
-	}*/
+@GetMapping({"/search/{searchBox}"})
+	public ResponseEntity<?> searchOrganizations(@PathVariable String searchBox) {
+		Set<Organization> organizations = organizationRepository.findByNameContaining(searchBox);
+		
+		if (organizations.isEmpty()) { 
+			System.out.println("this doesn't work");
+			return ResponseEntity.status(HttpStatus.OK).body("There are no matching results");
+		}
+		System.out.println("it actually works");
+		return ResponseEntity.status(HttpStatus.OK).body(organizations);
+	}
 	
 	@GetMapping(value ={"subscribed"}, produces = "application/json")
 	@ResponseBody
