@@ -7,6 +7,30 @@ import javax.validation.Valid;
 //Here are wrappers for complex View Models and Compound Request models
 public class CompoundModels {
 	
+	public static class IDStringPair{
+		public long Id;
+		public String Text;
+		public long getId(){
+			return Id;
+		}
+		public String getText(){
+			return Text;
+		}
+	}
+	
+	public static class SimpleId{
+		public long Id;
+		public long getId(){
+			return Id;
+		}
+		public void getId(long Id){
+			this.Id = Id;
+		}
+	}
+	
+	// Put simple/generic classes about and more specialized ones below.
+	
+	
 	public static class CreateAccountCM {
 		@Valid
 		public User user;
@@ -37,6 +61,28 @@ public class CompoundModels {
 		
 	}
 	
+	public static class ModifyEventCM {
+		@Valid
+		public Event event;
+		//public String startDate;
+		//public String endDate;
+		//public long organizationId;
+		public Event getEvent() {
+			return event;
+		}
+		//public String getStartDate() {
+		//	return startDate;
+		//}
+		//public String getEndDate() {
+		//	return endDate;
+		//}
+		//public long getOrganizationId( ) {
+		//	return organizationId;
+		//}
+
+		
+	}
+	
 	public static class CreateEventCM {
 		@Valid
 		public Event event;
@@ -57,16 +103,6 @@ public class CompoundModels {
 		}
 
 		
-	}
-
-	public static class SimpleId{
-		public long Id;
-		public long getId(){
-			return Id;
-		}
-		public void getId(long Id){
-			this.Id = Id;
-		}
 	}
 	
 	public static class OrganizationRespone{

@@ -82,6 +82,7 @@ class CreateOrganizationBox extends React.Component {
                     <Text style= {styles.TInputLabel}>Name</Text>
                     <TextInput
                         style = {styles.TInput}
+                        autoCorrect = {false}
                         onChangeText={(name) => this.setState({name})}
                         value={this.state.name}
                     />

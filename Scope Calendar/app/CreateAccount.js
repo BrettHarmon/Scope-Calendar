@@ -111,6 +111,8 @@ class LoginBox extends React.Component {
                     <Text style= {styles.TInputLabel}>Username</Text>
                     <TextInput
                         style = {styles.TInput}
+                        autoCorrect = {false}
+                        autoCapitalize = {'none'}
                         onChangeText={(username) => this.setState({username})}
                         value={this.state.username}
                     />
@@ -121,6 +123,8 @@ class LoginBox extends React.Component {
                     <Text style= {styles.TInputLabel}>Email</Text>
                     <TextInput
                         style = {styles.TInput}
+                        autoCorrect = {false}
+                        autoCapitalize = {'none'}
                         onChangeText={(email) => this.setState({email})}
                         keyboardType = {"email-address"}
                         value={this.state.email}

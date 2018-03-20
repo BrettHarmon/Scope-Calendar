@@ -1,12 +1,13 @@
 package scopeCalendar.controllers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.validation.Valid;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -14,12 +15,10 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,16 +26,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import scopeCalendar.models.CompoundModels.CreateEventCM;
-import scopeCalendar.models.CompoundModels.CreateOrganizationCM;
-import scopeCalendar.models.CompoundModels.OrganizationRespone;
-import scopeCalendar.models.CompoundModels.SimpleId;
+import scopeCalendar.models.CompoundModels.*;
 import scopeCalendar.models.Event;
 import scopeCalendar.models.Organization;
 import scopeCalendar.models.User;
-import scopeCalendar.repos.EventRepository;
-import scopeCalendar.repos.OrganizationRepository;
-import scopeCalendar.repos.UserRepository;
+import scopeCalendar.repos.*;
 import scopeCalendar.services.EventTimeComparer;
 
 @Controller
@@ -151,6 +145,51 @@ public class OrganizationController {
 		
 	}
 	
+	@PostMapping(value = {"event/modify"}, produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> ModifyEvent(@RequestBody @Valid ModifyEventCM evt, UriComponentsBuilder ucb, 
+									Model model) {
+		String error = "";
+		System.out.println("Event start time: " + evt.getEvent().getStartDate());
+		// Date time conversion
+		//DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss a");
+		/*System.out.println(userInput.startDate);
+		//DateTime startDate = formatter.parseDateTime(userInput.startDate);
+		DateTime endDate = formatter.parseDateTime(userInput.endDate);
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		// check if user is the owner (later change to has permission)
+		Organization organization = organizationRepository.findOne(userInput.getOrganizationId());
+		System.out.println(userInput.getOrganizationId());
+		if (user == null) {
+			System.out.println("heytherecowboy");
+			
+		}
+		if (organization.getOwner().getUserId() != user.getUserId()) {
+			error = "You do not have permission to do that";
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+		}
+		//set fields then save
+		userInput.getEvent().setEndDate(endDate);
+		userInput.getEvent().setStartDate(startDate);
+		userInput.getEvent().setTimezoneOffset();
+		//saving an organization has to happen first for some reason
+		//if there are no events in an organization previously, initialize the set, then add the event and save
+		if (organization.getEvents() == null) {
+		organization.setEvents(new HashSet<Event>());
+		}
+		organization.getEvents().add(userInput.getEvent());
+		organizationRepository.save(organization);
+		userInput.getEvent().setOrganization(organizationRepository.findByName(organization.getName()));
+		eventRepository.save(userInput.getEvent());
+		
+*/
+		
+		
+		return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.OK);
+		
+		
+	}
+	
 	@GetMapping(value ={"subscribed"}, produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<?> getSubscribedOrganizations() {
@@ -235,6 +274,39 @@ public class OrganizationController {
 		
 		organizationRepository.save(org);
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
+	}
+	
+	// Method responsible for modifying organization's description
+	@PostMapping(value = {"updateDescription"}, consumes = "application/json", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> UpdateDescription(@RequestBody IDStringPair params, UriComponentsBuilder ucb, 
+									Model model) {
+		
+		// Check to ensure the modifying user organization modifying privileges 
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		User loggedIn = userRepository.findByUsernameIgnoreCase(username);
+		//Get organization by ID
+		if(params.getId() < 1) {
+			return new ResponseEntity<Object>("Invalid organization ID", HttpStatus.BAD_REQUEST);
+		}
+		Organization org = organizationRepository.getOne(params.getId());
+		
+		// Make sure both are valid in DB
+		if(loggedIn == null || org == null) {
+			return new ResponseEntity<Object>("Error finding organization or user", HttpStatus.BAD_REQUEST);
+		}
+		if(!org.getOwner().equals(loggedIn)) {
+			return new ResponseEntity<Object>("User does not have authority to modify this organization", HttpStatus.BAD_REQUEST);
+		}
+		
+		// Check to see if description is actually changing (this is handled on app but best to be sure)
+		if(org.getDescription() == params.getText()) {
+			return new ResponseEntity<Object>("No change in the description", HttpStatus.OK);
+		}
+		
+		org.setDescription(params.getText());
+		organizationRepository.save(org);
+		return new ResponseEntity<Object>(true, HttpStatus.OK);
 	}
 	
 	

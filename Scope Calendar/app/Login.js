@@ -87,6 +87,8 @@ class LoginBox extends React.Component {
                     <Text style= {styles.TInputLabel}>Username or Email</Text>
                     <TextInput
                         style = {styles.TInput}
+                        autoCorrect = {false}
+                        autoCapitalize = {'none'}
                         onChangeText={(identity) => this.setState({identity})}
                         value={this.state.identity}
                     />

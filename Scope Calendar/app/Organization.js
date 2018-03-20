@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     StyleSheet, Dimensions, ScrollView, TouchableOpacity, Button, Text, View, Alert, AsyncStorage,
-    DeviceEventEmitter
+    DeviceEventEmitter, TextInput
 } from 'react-native';
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
@@ -127,6 +127,7 @@ class OrganizationProfile extends React.Component {
                     }
 
                     var firstDay = new Date(8640000000000000);  //Set as max possible date
+                    var dayChange = firstDay;
                     json.events.forEach((element) => {
                         //get day(as string) eg: '2018-03-15'
                         let startDateMils = element.startDate.millis;
@@ -154,7 +155,7 @@ class OrganizationProfile extends React.Component {
                     result.isSubbed = json.isSubscribed== 'true';
                     result.subs = parseInt(json.subscribers, 10);
                     result.upcomingEvents = events;
-                    result.firstEvent = new Date(utility.timeToString(firstDay.getTime()));
+                    result.firstEvent = (dayChange == firstDay)? []: new Date(utility.timeToString(firstDay.getTime()));
                     result.isPrivate = json.isPrivate== 'true';
                     result.isAdmin = json.isAdmin== 'true';
                     return result;
@@ -246,6 +247,23 @@ class OrganizationProfile extends React.Component {
 
     }
 
+    UpdateDescription(text){
+        fetch( Settings.HOME_URL + '/organization/updateDescription', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                Id: this.props.Id,
+                Text: text
+            })
+        })
+        this.setState({
+            description: text
+        })
+    }
+
     render() {
         if(!this.state.ready){
             return null;
@@ -263,7 +281,23 @@ class OrganizationProfile extends React.Component {
                 </View>
 
                 <View>
-                  <Text numberOfLines={5} style={{fontSize:14,  marginHorizontal: 30, marginVertical:10}}>{this.state.description}</Text>
+                <TextInput style={{fontSize:14, paddingHorizontal: 6, paddingBottom:8, marginHorizontal: 30, marginVertical:10}}
+                            ref= {component => this._descText = component}
+                            editable={this.state.isAdmin}
+                            onEndEditing= {(e) => {let txt = e.nativeEvent.text;
+                                if(txt != this.state.description){
+                                    Alert.alert(
+                                    'Update description',
+                                    'Are you sure you want to update the description for '+this.state.name+ '?',
+                                    [
+                                        {text: 'Cancel', style: 'cancel', onPress: () => {this._descText.setNativeProps({ text: '' }) }},
+                                        {text: 'OK', onPress: () => {this.UpdateDescription(txt)}},
+                                    ],
+                                    { cancelable: true }
+                                )}
+                            }}
+                            multiline={true}
+                            >{this.state.description}</TextInput>
                 </View>
 
                 <View style={styles.hr}/>
