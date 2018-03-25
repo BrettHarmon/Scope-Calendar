@@ -52,14 +52,14 @@ import scopeCalendar.services.CustomUserDetailsService;
 		
 		   @Override
 		    public void configure(WebSecurity web) throws Exception {
-		        web.debug(true);
+		        //web.debug(true);
 		    }
 		   
 		@Override
 	    protected void configure(HttpSecurity http) throws Exception {
 	        http
 	            .authorizeRequests()
-	                .antMatchers("/", "/signup", "/login").permitAll()
+	                .antMatchers("/", "/signup", "/login", "/signin").permitAll()
 	                .anyRequest().authenticated()
 	                .and()
 	            .formLogin()

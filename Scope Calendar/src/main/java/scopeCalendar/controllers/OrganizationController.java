@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,8 +70,8 @@ public class OrganizationController {
 		event.setName("Example event");
 		event.setDescription("This is just an example event. Soon you can add more!");
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-		DateTime startDate = formatter.parseDateTime("2018/03/24 01:00:00");
-		DateTime endDate = formatter.parseDateTime("2018/03/24 05:00:00");
+		DateTime startDate = formatter.parseDateTime("2018/03/28 01:00:00");
+		DateTime endDate = formatter.parseDateTime("2018/03/28 05:00:00");
 		event.setStartDate(startDate);
 		event.setEndDate(endDate);
 		event.setTimezoneOffset();
@@ -197,10 +198,8 @@ public class OrganizationController {
 		Set<Organization> organizations = organizationRepository.findByNameContaining(searchBox);
 		
 		if (organizations.isEmpty()) { 
-			System.out.println("this doesn't work");
 			return ResponseEntity.status(HttpStatus.OK).body("There are no matching results");
 		}
-		System.out.println("it actually works");
 		return ResponseEntity.status(HttpStatus.OK).body(organizations);
 	}
 	
@@ -266,23 +265,29 @@ public class OrganizationController {
 	public ResponseEntity<?> ToggleSubscription(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
 									Model model) {
 		
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		User loggedIn = userRepository.findByUsernameIgnoreCase(username);
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Organization org = organizationRepository.getOne(idObj.getId());
 		
-		if(loggedIn == null || org == null) {
+		if(user == null || org == null) {
+			System.out.println("The problem is here");
+			if (user == null) {
+				System.out.println("yeah loggedin is null");
+			}
+			if (org == null) {
+				System.out.println("yeah org is null");
+			}
 			return new ResponseEntity<Object>("Error finding organization or user", HttpStatus.BAD_REQUEST);
 		}
-		boolean subbed = loggedIn.getSubscribedOrganizations().contains(org);
+		boolean subbed = user.getSubscribedOrganizations().contains(org);
 		
 		HashMap<String, String> response = new HashMap<>();
 		
 		if(subbed) {
-			org.removeSubscriber(loggedIn);
+			org.removeSubscriber(user);
 			response.put("subbed", "false");
 		}
 		else {
-			org.addSubscriber(loggedIn);
+			org.addSubscriber(user);
 			response.put("subbed", "true");
 		}
 		

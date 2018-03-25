@@ -37,22 +37,23 @@ class LoginBox extends React.Component {
         var that = this;
 
         const querystring = require('querystring');
+        console.log(password);
 
         return (
             fetch( Settings.HOME_URL + '/signin', {
 
                 method: 'POST',
                 headers: {
-                    "Content-type": "application/x-www-form-urlencoded",
+                    'Content-type': 'application/x-www-form-urlencoded',
                 },
                 body: querystring.stringify({
                     identity: identity,
-                    password: password,
+                    password: password
                 })
             })
             .then((response) => {
                 //console.log(response);
-                if(response.ok ) {
+                if(response.ok) {
                     response.json().then(function (json) {
                         console.log('Log in response: ', json.username);
                         //Cookie to perserve authenticted user
