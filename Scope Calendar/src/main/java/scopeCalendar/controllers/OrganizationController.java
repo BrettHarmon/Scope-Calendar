@@ -15,6 +15,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,6 +48,13 @@ public class OrganizationController {
 	@Autowired
 	EventRepository eventRepository;
 	
+	//helper function to get logged in user
+	public User getUser() {
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		String username = loggedInUser.getName();
+		return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username);
+	}
+	
 
 	@PostMapping(value = {"create"}, produces = "application/json")
 	@ResponseBody
@@ -58,7 +66,8 @@ public class OrganizationController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 		}
 		System.out.println(userInput.getOrganization().getDescription() + userInput.getOrganization().getName());
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = getUser();
+
 		userInput.getOrganization().setOwner(user);
 		// initialize the organization subbed users set
 		userInput.getOrganization().setSubbedUsers(new HashSet<User>());
@@ -207,7 +216,7 @@ public class OrganizationController {
 	@ResponseBody
 	public ResponseEntity<?> getSubscribedOrganizations() {
 		//first get the user, then return their subscribed organizations set
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = getUser();
 		System.out.println("Subbed organizations requested");
 		List<Organization> subbed = new ArrayList<Organization>();
 		if (user.getSubscribedOrganizations() == null)
@@ -238,8 +247,7 @@ public class OrganizationController {
 		result.setIsPrivate(String.valueOf(org.getPrivate()));
 		
 		//find out if user is a subscriber to organization
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		User loggedIn = userRepository.findByUsernameIgnoreCase(username);
+		User loggedIn = getUser();
 		result.setIsSubscribed( String.valueOf(org.getSubbedUsers().contains(loggedIn)));
 		result.setIsAdmin(String.valueOf(org.getOwner().equals(loggedIn)));
 		
@@ -265,7 +273,7 @@ public class OrganizationController {
 	public ResponseEntity<?> ToggleSubscription(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
 									Model model) {
 		
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = getUser();
 		Organization org = organizationRepository.getOne(idObj.getId());
 		
 		if(user == null || org == null) {
@@ -302,8 +310,7 @@ public class OrganizationController {
 									Model model) {
 		
 		// Check to ensure the modifying user organization modifying privileges 
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		User loggedIn = userRepository.findByUsernameIgnoreCase(username);
+		User loggedIn = getUser();
 		//Get organization by ID
 		if(params.getId() < 1) {
 			return new ResponseEntity<Object>("Invalid organization ID", HttpStatus.BAD_REQUEST);

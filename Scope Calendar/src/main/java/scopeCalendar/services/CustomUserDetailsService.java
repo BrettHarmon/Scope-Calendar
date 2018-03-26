@@ -32,6 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException(
               "No user found with username: "+ username);
         }
+        String password = user.getPassword();
         System.out.println("it has been found");
         boolean enabled = true;
         boolean accountNonExpired = true;

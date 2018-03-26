@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -41,6 +42,13 @@ public class UserController {
 	
 	@Autowired
 	private IUserService userService;
+	
+	//helper function to get logged in user
+	public User getUser() {
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		String username = loggedInUser.getName();
+		return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username);
+	}
 	
 	@PostMapping(value = {"/signup"}, produces = "application/json")
 	@ResponseBody
@@ -124,7 +132,7 @@ public class UserController {
 	@ResponseBody
 	public ResponseEntity<?> UserEventList(Model model) {
 		String error = "";
-		User user = userRepository.findByUsernameIgnoreCase(SecurityContextHolder.getContext().getAuthentication().getName());
+		User user = getUser();
 		
 		HashMap<String, Set<Event>> result = new HashMap<>();
 		List<Organization> subbedOrgs = new LinkedList<Organization>(user.getSubscribedOrganizations());
