@@ -1,5 +1,6 @@
 import React from 'react';
-import {TouchableOpacity, StyleSheet, ScrollView, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import {TextInput, StyleSheet, Text, View, TouchableHighlight,
+   Modal, Animated, Button} from 'react-native';
 import DatePicker from 'react-native-datepicker';
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
@@ -9,31 +10,16 @@ import * as Settings from './Settings.js' //Include on every page
 var styles = require('./Styles.js');
 
 
-export class CreateEventScreen extends React.Component {
-    static navigationOptions = {
-        title: 'Find Organizations',
-    };
-    render() {
-        const { params } = this.props.navigation.state;
-        console.log("hey " + params);
-        const OrganizationId = params ? params.Id : null;
-        console.log("eventId = " + eventId);
-        return (
-            <View style={styles.container}>
-                <EventModifyBox eventId={eventId} navigation={this.props.navigation}/>
-            </View>
-        );
-    }
-}
-
-class EventModifyBox extends React.Component {
+export class EventModifyBox extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {description : '',
-            name : '',
-            endDate: 0,
-            startDate : 0,
-            ready: false,
+        this.state = {
+            //id: params.EventId || 0,
+            description : this.props.description || '',
+          //  name : params.name || '', //this shouldn't be blank
+          //  endDate: params.endDate || 0, //Dates will be held as ticks (milliSec)
+          //  startDate : params.startDate || 0,
+            visible: this.props.seen || false,
         };
     }
 
@@ -51,7 +37,7 @@ class EventModifyBox extends React.Component {
         let description = this.state.description;
         let endDate = this.state.endDate;
         let startDate = this.state.startDate;
-        let organization = this.props.organizationId;
+        let evtId = this.state.id;
         var that = this;
         return(fetch( Settings.HOME_URL + '/organization/event/modify', {
             method: 'POST',
@@ -63,11 +49,10 @@ class EventModifyBox extends React.Component {
                 event:{
                     name: name,
                     description: description,
-                },
-                startDate: startDate,
-                endDate: endDate,
-                organizationId: organization,
-
+                    startDate: startDate,
+                    endDate: endDate,
+                    eventId: evtId,
+                }
             })
         })
             .then((response) => {
@@ -90,8 +75,15 @@ class EventModifyBox extends React.Component {
 
 
     render() {
-        return (
-            <View style={styles.bodyView}>
+      console.log('EventBox Modal rendered. Visable?', this.state.visible);
+      return(
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={this.state.visible}
+          onRequestClose={() => this.setState({visible: false})}  >
+          <View style={{flex: 1, marginTop: 22}}>
                 <View style= {styles.InputSpan}>
                     <Text style= {styles.TInputLabel}>Name</Text>
                     <TextInput
@@ -115,8 +107,8 @@ class EventModifyBox extends React.Component {
                         style={{width: 200}}
                         date={this.state.startDate}
                         mode ="datetime"
-                        format="YYYY-MM-DD h:mm:ss a"
-                        onDateChange={(date) => {this.setState({startDate: date})}}
+                        format="MMMM DD YYYY h:mm:ss a"
+                        onDateChange={(date) => {this.setState({startDate: new Date(date).getTime()})}}
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"
                         placeholder="select a start date"
@@ -140,8 +132,8 @@ class EventModifyBox extends React.Component {
                         style={{width: 200}}
                         date={this.state.endDate}
                         mode ="datetime"
-                        format="YYYY-MM-DD h:mm:ss a"
-                        onDateChange={(date) => {this.setState({endDate: date})}}
+                        format="MMMM DD YYYY h:mm:ss a"
+                        onDateChange={(date) => {this.setState({endDate: new Date(date).getTime()})}}
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"
                         placeholder="select a end date"
@@ -160,10 +152,15 @@ class EventModifyBox extends React.Component {
                     />
                 </View>
 
-                <Button title="Create Event" onPress={this.createEvent.bind(this)} />
+                <Button title="Update Event" onPress={this.ChangeEvent.bind(this)} />
+          </View>
+        </Modal>
 
-            </View>
-        )
+      )
+
+      /*  return (
+
+        )*/
     }
 
 

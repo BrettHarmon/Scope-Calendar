@@ -27,9 +27,9 @@ NOT EXISTS (
 
 insert into events (event_id, description, end_date, name, start_date, time_zone_offset, organization_id)
 VALUES 
-	(1,'Wednesday practice @Field 1', '2018-03-15 00:00:00', 'Evening wednesday practice', '2018-03-14 22:00:00', -5, 2),
-	(2,	'Game Day. Home game: @Field 2', '2018-03-07 01:00:00', 'Marlins vs. Dodgers', '2018-03-06 23:30:00', -5, 2),
-	(3,	'Wednesday practice @Field 1', '2018-03-08 01:00:00', 'Evening wednesday practice', '2018-03-07 23:00:00', -5, 2),
-	(4, 'Practice. Meet @ Field 2', '2018-03-10 16:30:00', 'Saturday morning practice', '2018-03-10 14:30:00', -5, 2),
-	(5, 'Table will be set up in cafeteria', '2018-03-10 19:30:00', 'Saturday Fundraiser', '2018-03-10 18:30:00', -5, 2)
+	(1,'Wednesday practice @Field 1', '2018-03-29 00:00:00', 'Evening wednesday practice', '2018-03-28 22:00:00', -5, 2),
+	(2,	'Game Day. Home game: @Field 2', '2018-04-04 01:00:00', 'Marlins vs. Dodgers', '2018-04-03 23:30:00', -5, 2),
+	(3,	'Wednesday practice @Field 1', '2018-04-08 01:00:00', 'Evening wednesday practice', '2018-04-07 23:00:00', -5, 2),
+	(4, 'Practice. Meet @ Field 2', '2018-04-10 16:30:00', 'Saturday morning practice', '2018-04-10 14:30:00', -5, 2),
+	(5, 'Table will be set up in cafeteria', '2018-04-10 19:30:00', 'Saturday Fundraiser', '2018-04-10 18:30:00', -5, 2)
 ON CONFLICT DO NOTHING

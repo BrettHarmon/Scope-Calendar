@@ -1,10 +1,11 @@
 import React from 'react';
 import {
     StyleSheet, Dimensions, ScrollView, TouchableOpacity, Button, Text, View, Alert, AsyncStorage,
-    DeviceEventEmitter, TextInput
+    DeviceEventEmitter, TextInput, Modal
 } from 'react-native';
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import { EventModifyBox } from './EventModify.js'
 
 var utility = require('./fnUtils.js');
 import * as Settings from './Settings.js' //Include on every page
@@ -49,6 +50,8 @@ class OrganizationProfile extends React.Component {
             selected: null,
             isPrivate: null,
             isAdmin: null,
+            seeModal: false,
+            ModalKey: 0,
         };
 
 
@@ -146,7 +149,7 @@ class OrganizationProfile extends React.Component {
                             description: element.description,
                             start : new Date(element.startDate.millis + (offset * 3600 * 1000) ),
                             end : new Date(element.endDate.millis + (offset * 3600 * 1000)),
-                            eventId: parseInt(element.Id, 10),
+                            eventId: parseInt(element.eventId, 10),
                         });
                     });
                     let result = {};
@@ -268,7 +271,7 @@ class OrganizationProfile extends React.Component {
         if(!this.state.ready){
             return null;
         }
-        console.log(this.props.Id);
+        console.log(this.props.Id, this.state.seeModal);
         let that = this;
         var yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
@@ -327,9 +330,19 @@ class OrganizationProfile extends React.Component {
                         agendaKnobColor: '#6b52ae'
                     }}
                 />
+
+
+              <EventModifyBox key={this.state.ModalKey} seen={this.state.seeModal} EventId= {0} />
+
             </View>
         );
     }
+
+    editEvent(event){
+      console.log('EventUpdate; revealing modal');
+      this.setState({ModalKey: Math.random(), seeModal: true});
+    }
+
     renderItem(item) {
         let minHeight = 90, maxHeight = 200;
         //Map differing time lengths to height on agenda (Max out at 5 hours)
@@ -337,6 +350,7 @@ class OrganizationProfile extends React.Component {
         let setHeight = Math.floor(minHeight+ (maxHeight-minHeight) * (hours/5));
         return (
             <View style={[styles.agendaItem, {height: setHeight}]}>
+                <Button title="Test Edit" onPress={() => this.editEvent(item)} />
                 <Text style={{fontSize:16,  fontWeight: 'bold'}}>{item.event}</Text>
                 <Text style={{fontSize:14, fontWeight: 'bold'}}> {item.start.neatTime()} - {item.end.neatTime()} </Text>
                 <Text>{item.description}</Text>
