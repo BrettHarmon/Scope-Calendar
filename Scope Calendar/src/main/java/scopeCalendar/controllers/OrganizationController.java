@@ -15,6 +15,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,9 +50,9 @@ public class OrganizationController {
 	
 	//Get logged in user helper
 	private User getUser() {
-		User userWrapper = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User resultUser = userRepository.findByUsernameIgnoreCase(userWrapper.getUsername());
-		return resultUser;
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication(); 
+		String username = loggedInUser.getName(); 
+		return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username); 
 	}
 	
 
