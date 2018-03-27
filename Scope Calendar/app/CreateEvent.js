@@ -11,7 +11,7 @@ var styles = require('./Styles.js');
 
 export class CreateEventScreen extends React.Component {
     static navigationOptions = {
-        title: 'Find Organizations',
+        title: 'Create event',
     };
     render() {
         const { params } = this.props.navigation.state;
