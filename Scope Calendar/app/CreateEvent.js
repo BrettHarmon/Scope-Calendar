@@ -151,7 +151,7 @@ class CreateEventBox extends React.Component {
                     />
                 </View>
 
-                <Button title="Create Event" onPress={this.createEvent.bind(this)} />
+                <Button title="Create Event" onPress={this.createEvent.bind(this)} color={'#6b52ae'}/>
 
             </View>
         )

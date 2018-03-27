@@ -153,6 +153,7 @@ export class EventModifyBox extends React.Component {
                 </View>
 
                 <Button title="Update Event" onPress={this.ChangeEvent.bind(this)} />
+                <Button title="Cancel" onPress={() => this.setState({visible: false})}  />
           </View>
         </Modal>
 

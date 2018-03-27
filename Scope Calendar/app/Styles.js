@@ -4,9 +4,9 @@ import React from 'react';
 import { StyleSheet} from 'react-native';
 
 
-export const purple = '#6b52ae';
-module.exports = StyleSheet.create({
+export const PURPLE = "#6b52ae";
 
+module.exports = StyleSheet.create({
     //FlexBox styling
     FlexBoxContainerEvenRowSpacing: {
         flexWrap: 'wrap',
@@ -37,7 +37,7 @@ module.exports = StyleSheet.create({
 
     SubscribeButton:{
         borderRadius: 6,
-        backgroundColor: purple,
+        backgroundColor: PURPLE,
         paddingHorizontal: 10,
         paddingVertical: 10,
         marginVertical: 5,

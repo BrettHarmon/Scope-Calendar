@@ -120,7 +120,7 @@ public class OrganizationController {
 		System.out.println(userInput.startDate);
 		DateTime startDate = formatter.parseDateTime(userInput.startDate);
 		DateTime endDate = formatter.parseDateTime(userInput.endDate);
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = getUser();
 		// check if user is the owner (later change to has permission)
 		Organization organization = organizationRepository.findOne(userInput.getOrganizationId());
 		System.out.println(userInput.getOrganizationId());

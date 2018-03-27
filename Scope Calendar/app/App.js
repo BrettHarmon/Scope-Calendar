@@ -187,6 +187,9 @@ const RootStack = StackNavigator(
         CreateEvent: {
             screen: CreateEventScreen
         },
+        Search: {
+            screen: SearchScreen,
+        },
     },
     {
         initialRouteName: 'Home',
@@ -228,4 +231,3 @@ const Drawer = DrawerNavigator({
     })
 
 export default Drawer;
-

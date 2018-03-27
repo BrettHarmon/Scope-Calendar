@@ -8,8 +8,8 @@ import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { EventModifyBox } from './EventModify.js'
 
 var utility = require('./fnUtils.js');
-import * as Settings from './Settings.js' //Include on every page
-var styles = require('./Styles.js');
+import * as Settings from './Settings.js'; //Include on every page
+import * as styles from './Styles.js';
 
 export class OrganizationProfileScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -17,6 +17,7 @@ export class OrganizationProfileScreen extends React.Component {
         let defaultTitle = 'Organization Profile'
         return {
             title: typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? defaultTitle: navigation.state.params.title,
+            headerRight: navigation.state.params.addEvent || ''
         };
     };
 
@@ -62,6 +63,12 @@ class OrganizationProfile extends React.Component {
             .then((org) => {
                 if (!!org){ //org object exists (not undefined/null/empty string)
                     this.props.navigation.setParams({ title: org.name });
+                    if(org.isAdmin){
+                        this.props.navigation.setParams({
+                            addEvent:<TouchableOpacity  onPress={() => this.props.navigation.navigate('CreateEvent', {Id : this.props.Id})}>
+                                            <Iconz name="md-add" color ="white" size={28} style={{marginRight: 20}}/>
+                                    </TouchableOpacity>, });
+                    }
                     this.setState({
                         name: org.name,
                         subscribed: org.isSubbed,
@@ -85,6 +92,12 @@ class OrganizationProfile extends React.Component {
         .then((org) => {
                 if (!!org){ //org object exists (not undefined/null/empty string)
                     this.props.navigation.setParams({ title: org.name });
+                    if(org.isAdmin){
+                        this.props.navigation.setParams({
+                            addEvent:<TouchableOpacity  onPress={() => this.props.navigation.navigate('CreateEvent', {Id : this.props.Id})}>
+                                            <Iconz name="md-add" color ="white" size={28} style={{marginRight: 20}}/>
+                                    </TouchableOpacity>, });
+                    }
                     this.setState({
                         name: org.name,
                         subscribed: org.isSubbed,
@@ -222,7 +235,7 @@ class OrganizationProfile extends React.Component {
                                       ],
                                       { cancelable: true }
                                   )}}>
-                    <Text style={{color:'#fff'}} >Subscribed</Text>
+                    <Text style={{color:'#fff', fontWeight:'bold'}} >Subscribed</Text>
                     <Iconz name="md-checkmark" style={{paddingLeft: 5}} color ="#fff" size={20}/>
                 </TouchableOpacity>
             );
@@ -236,7 +249,7 @@ class OrganizationProfile extends React.Component {
         }
         else
         	return(
-        		<TouchableOpacity style={styles.SubscribeButton }  onPress={() => {Alert.alert(
+        		<TouchableOpacity style={[styles.SubscribeButton, {backgroundColor: '#aaa'} ]}  onPress={() => {Alert.alert(
         							'Private Organization',
         							'You must request an invitation from the owner to subscribe to '+this.state.name + '.',
         							[
@@ -244,7 +257,7 @@ class OrganizationProfile extends React.Component {
 
         							]
         						)}}>
-                    <Text style={{color:'#aaa', fontWeight:'bold' }}>Private</Text>
+                    <Text style={{color:'#000', fontWeight:'bold' }}>Private</Text>
                 </TouchableOpacity>
         	)
 
@@ -271,7 +284,6 @@ class OrganizationProfile extends React.Component {
         if(!this.state.ready){
             return null;
         }
-        console.log(this.props.Id, this.state.seeModal);
         let that = this;
         var yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
@@ -306,9 +318,6 @@ class OrganizationProfile extends React.Component {
                 <View style={styles.hr}/>
                 <View>
                     <Text style ={[styles.TextTitle, {textDecorationLine: 'underline'}]}> Upcoming Events </Text>
-                    <TouchableOpacity  onPress={() => that.props.navigation.navigate('CreateEvent', {Id : that.props.Id})}>
-                        <Iconz name="md-add" color ="black" size={28} style={{marginRight: 20}}/>
-                    </TouchableOpacity>
                 </View>
 
                 <Agenda

@@ -153,7 +153,7 @@ class LoginBox extends React.Component {
                     />
                 </View>
 
-                <Button title="Create Account" onPress={this.createAccount.bind(this)} />
+                <Button title="Create Account" onPress={this.createAccount.bind(this)} color={"#6b52ae"}/>
                 <KeyboardSpacer/>
             </ScrollView>
         )

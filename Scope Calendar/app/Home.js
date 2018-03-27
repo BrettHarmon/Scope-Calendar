@@ -52,10 +52,9 @@ export class DetailsScreen extends React.Component {
               markedDates={ this.state.calendarData }
               //markedDates={{[this.state.selected]: {selected: true, disableTouchEvent: true, selectedColor: '#6b52ae'}}}
               onDayPress={this.onDayPress.bind(this)}
-              pastScrollRange={today.getMonth()} //Cant scroll past this year
+              pastScrollRange={today.getMonth()}
               markingType={'multi-dot'}
               showScrollIndicator={true}
-              displayLoadingIndicator= {true}
               theme={{
                 todayTextColor: '#6b52ae',
                 selectedDayBackgroundColor: '#6b52ae',
@@ -162,14 +161,13 @@ export class DetailsScreen extends React.Component {
   */
   parseEvents(events){
     let today = new Date();
-
     let data = {};
     Object.getOwnPropertyNames(events).forEach((orgs, idx) => {
         var orgName = orgs;
         let orgInfo = {key:orgName, color: this.colors[idx], colorIndex: idx};
 
         events[orgName].forEach((event) => {
-            let dayKey = new Date(event.startDate.millis).UTCToString();
+            let dayKey = new Date(event.startDate.millis+ (event.timezoneOffset *3600000)).UTCToString();
             // initialize data object element
             if(!data[dayKey]){
                 data[dayKey] = { dots: [], events: {}};
@@ -187,8 +185,8 @@ export class DetailsScreen extends React.Component {
             data[dayKey].events[orgName].push({
               event: event.name,
               description: event.description,
-              start : new Date(event.startDate.millis),
-              end : new Date(event.endDate.millis),
+              start : new Date(event.startDate.millis + (event.timezoneOffset *3600000) ),
+              end : new Date(event.endDate.millis + (event.timezoneOffset *3600000) ),
             });
         });
     });

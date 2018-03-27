@@ -131,7 +131,7 @@ class LoginBox extends React.Component {
                         value={this.state.password}
                     />
                 </View>
-                <Button title="Log in" onPress={this.login.bind(this)} />
+                <Button title="Log in" onPress={this.login.bind(this)} color = {"#6b52ae"}/>
 
 
 
