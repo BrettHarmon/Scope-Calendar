@@ -246,7 +246,6 @@ public class OrganizationController {
 		
 		//find out if user is a subscriber to organization
 		User loggedIn = getUser();
-		
 		result.setIsSubscribed( String.valueOf(org.getSubbedUsers().contains(loggedIn)));
 		result.setIsAdmin(String.valueOf(org.getOwner().equals(loggedIn)));
 		
@@ -308,6 +307,7 @@ public class OrganizationController {
 	public ResponseEntity<?> UpdateDescription(@RequestBody IDStringPair params, UriComponentsBuilder ucb, 
 									Model model) {
 		
+		// Check to ensure the modifying user organization modifying privileges 
 		User loggedIn = getUser();
 		//Get organization by ID
 		if(params.getId() < 1) {

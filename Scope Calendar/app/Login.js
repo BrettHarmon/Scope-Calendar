@@ -28,7 +28,8 @@ class LoginBox extends React.Component {
         this.state = {
             password : '',
             identity : '',
-            error: ''};
+            error: '',
+            fake: true,};
     }
 
     login(event) {
@@ -36,8 +37,18 @@ class LoginBox extends React.Component {
         var password = this.state.password;
         var that = this;
 
-        const querystring = require('querystring');
-        console.log(password);
+        var details = {
+            'identity': identity,
+            'password': password
+        };
+
+        var formBody = [];
+        for (var property in details) {
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
 
         return (
             fetch( Settings.HOME_URL + '/signin', {
@@ -46,34 +57,50 @@ class LoginBox extends React.Component {
                 headers: {
                     'Content-type': 'application/x-www-form-urlencoded',
                 },
-                body: querystring.stringify({
-                    identity: identity,
-                    password: password
-                })
+                body: formBody
             })
             .then((response) => {
-                //console.log(response);
                 if(response.ok) {
-                    response.json().then(function (json) {
-                        console.log('Log in response: ', json.username);
-                        //Cookie to perserve authenticted user
-                        let user = {
-                                //id: json.userId,
-                                username: json.username,
-                        };
-                        //Keychain.setGenericPassword(json.username, "password");
-                        //Storage.set('UserInfo', json.username); //JSON.stringify(user));
-                        //AsyncStorage.setItem();
-                        DeviceEventEmitter.emit('refreshHome',  json.username);
-                        that.props.navigation.popToTop(); //go back to start
-                    });
+
+                    return fetch( Settings.HOME_URL + '/LoginAuth', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            "Content-type": "application/x-www-form-urlencoded",
+                        },
+                    })
+                        .then((response) => {
+                            return response.json().then(function (json) {
+                                username = json.username;
+                                if(username == 'anonymousUser'){ //ran in debug with all authentication allowed
+                                    return null;
+                                }
+                                //Cookie to perserve authenticted user
+                                let user = {
+                                    //id: json.userId,
+                                    username: json.username,
+                                };
+                                DeviceEventEmitter.emit('refreshHome',  json.username);
+                                that.props.navigation.popToTop(); //go back to start
+                            })
+                        }).catch((error) => {
+                            console.log('Error with userInfoFetch');
+                        });
+
                 }
                 else{
-                    that.setState({error: "Could not find account with that username/email and password."});
+                    that.setState({error: "Could not find hello with that username/email and password."});
+                    response.json().then(function (json) {
+                        console.log(json + "heyyyyeeeee");
+                    });
+                    if (response === null) {
+                        console.log("response is null");
+                    }
                 }
             })
 
             .catch((err) => {
+                console.log(err + 'rerererere');
                 that.setState({error: err.message});
             })
         );
