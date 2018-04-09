@@ -31,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import scopeCalendar.models.CompoundModels.*;
 import scopeCalendar.models.Event;
 import scopeCalendar.models.Organization;
+import scopeCalendar.models.Tag;
 import scopeCalendar.models.User;
 import scopeCalendar.repos.*;
 import scopeCalendar.services.EventTimeComparer;
@@ -47,6 +48,9 @@ public class OrganizationController {
 	
 	@Autowired
 	EventRepository eventRepository;
+	
+	@Autowired
+	TagRepository tagRepository;
 	
 	//Get logged in user helper
 	private User getUser() {
@@ -73,13 +77,23 @@ public class OrganizationController {
 		userInput.getOrganization().setEvents(new HashSet<Event>());
 		userInput.getOrganization().addSubscriber(user);
 		
+		//this is tag creation
+		for (String tagName: userInput.getTags()) {
+			Tag tag = tagRepository.findByName(tagName);
+			if (tag == null) {
+				tag = new Tag(tagName);
+				tagRepository.save(tag);
+			}
+			userInput.getOrganization().addTag(tag);
+		}
+		
 		//create dummy event for now
 		Event event = new Event();
 		event.setName("Example event");
 		event.setDescription("This is just an example event. Soon you can add more!");
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-		DateTime startDate = formatter.parseDateTime("2018/03/28 01:00:00");
-		DateTime endDate = formatter.parseDateTime("2018/03/28 05:00:00");
+		DateTime startDate = formatter.parseDateTime("2018/05/28 01:00:00");
+		DateTime endDate = formatter.parseDateTime("2018/05/28 05:00:00");
 		event.setStartDate(startDate);
 		event.setEndDate(endDate);
 		event.setTimezoneOffset();
@@ -124,10 +138,6 @@ public class OrganizationController {
 		// check if user is the owner (later change to has permission)
 		Organization organization = organizationRepository.findOne(userInput.getOrganizationId());
 		System.out.println(userInput.getOrganizationId());
-		if (user == null) {
-			System.out.println("heytherecowboy");
-			
-		}
 		if (organization.getOwner().getUserId() != user.getUserId()) {
 			error = "You do not have permission to do that";
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -202,8 +212,16 @@ public class OrganizationController {
 	
 	
 @GetMapping({"/search/{searchBox}"})
-	public ResponseEntity<?> searchOrganizations(@PathVariable String searchBox) {
-		Set<Organization> organizations = organizationRepository.findByNameContaining(searchBox);
+	public ResponseEntity<?> searchOrganizations(@PathVariable List<String> searchBox) {
+		
+		Set<Organization> organizations = new HashSet<Organization>(); 
+		if (searchBox.size() == 1) {
+		 organizations = organizationRepository.findByNameContainingIgnoreCase(searchBox.get(1));
+		}
+		Set<Tag> tags = tagRepository.findDistinctByNameIn(searchBox);
+		if (!tags.isEmpty()) {
+			organizations = organizationRepository.findByTags(tags);
+		}
 		
 		if (organizations.isEmpty()) { 
 			return ResponseEntity.status(HttpStatus.OK).body("There are no matching results");

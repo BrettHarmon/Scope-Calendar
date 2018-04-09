@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
+import Tags from 'react-native-tags';
 
 var utility = require('./fnUtils.js');
 import * as Settings from './Settings.js' //Include on every page
@@ -27,6 +28,7 @@ class CreateOrganizationBox extends React.Component {
         this.state = {
             name : '',
             description : '',
+            tags: [],
             owner : '',
             generalErr:'',};
     }
@@ -34,6 +36,7 @@ class CreateOrganizationBox extends React.Component {
     createOrganization(event) {
         let name = this.state.name;
         let description = this.state.description;
+        let tags = this.state.tags;
         var that = this;
         return(fetch( Settings.HOME_URL + '/organization/create', {
             method: 'POST',
@@ -45,7 +48,8 @@ class CreateOrganizationBox extends React.Component {
                 organization:{
                     name: name,
                     description: description,
-                }
+                },
+                tags: tags,
             })
         })
             .then((response) => {
@@ -94,6 +98,17 @@ class CreateOrganizationBox extends React.Component {
                         style = {styles.TInput}
                         onChangeText={(description) => this.setState({description})}
                         value={this.state.description}
+                    />
+                </View>
+
+                <View style= {styles.InputSpan}>
+                    <Text style= {styles.TInputLabel}>Description</Text>
+                    <Tags
+                        initialText=""
+                        initialTags={['dog', 'cat', 'chicken']}
+                        onChangeTags={() => console.log('')}
+                        onTagPress={(index, tagLabel, event) => console.log(index, tagLabel, event)}
+                        inputStyle={{ backgroundColor: 'white' }}
                     />
                 </View>
 

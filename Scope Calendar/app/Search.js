@@ -30,14 +30,14 @@ class SearchBox extends React.Component {
     }
 
     searchOrganizations() {
-        let that = this;
-        let searchBox = that.state.searchBox;
+        //let that = this;
+        let searchBox = this.state.searchBox;
         return fetch( Settings.HOME_URL + '/organization/search/' + searchBox)
             .then((response) => response.json())
             .then((responseJson) => {
-                that.setState({organizations: responseJson, showResults: true});
+                this.setState({organizations: responseJson, showResults: true});
 
-                 console.log(that.state.organizations);
+                 console.log(this.state.organizations);
             })
             .catch((error) => {
                 console.error(error);

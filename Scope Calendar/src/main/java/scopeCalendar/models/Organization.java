@@ -1,6 +1,7 @@
 package scopeCalendar.models;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -13,6 +14,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "organizations")
 public class Organization implements Serializable {
 	private static final long serialVersionUID = -5513950805803868005L;
+	
+	public Organization() {
+		this.tags = new HashSet<Tag>();
+	}
 	
 	@Id
 	@SequenceGenerator(initialValue=1000, 
@@ -44,6 +49,23 @@ public class Organization implements Serializable {
 	@JsonIgnore
 	private Set<User> subbedUsers;
 	
+	@ManyToMany(targetEntity=Tag.class)
+    @JoinTable(
+          name="tag_organization_junction",
+    		  joinColumns=@JoinColumn(name="organizationId"),
+    		  inverseJoinColumns=@JoinColumn(name="tagId")
+        )
+	@JsonIgnore
+	private Set<Tag> tags;
+	
+	public Set<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
+	}
+
 	@OneToMany(mappedBy = "organization")
 	@JsonIgnore
 	private Set<Event> events;
@@ -87,6 +109,13 @@ public class Organization implements Serializable {
 	}
 	public void removeSubscriber(User user) {
 		subbedUsers.remove(user);
+	}
+	
+	public void addTag(Tag tag) {
+		tags.add(tag);
+	}
+	public void removeTag(Tag tag) {
+		tags.remove(tag);
 	}
 
 

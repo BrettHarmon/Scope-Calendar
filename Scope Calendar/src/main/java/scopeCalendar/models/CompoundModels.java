@@ -53,8 +53,13 @@ public class CompoundModels {
 	public static class CreateOrganizationCM {
 		@Valid
 		public Organization organization;
+		
+		public List<String> tags;
 		public Organization getOrganization() {
 			return organization;
+		}
+		public List<String> getTags() {
+			return tags;
 		}
 
 
