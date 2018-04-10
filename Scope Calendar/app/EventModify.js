@@ -14,29 +14,34 @@ export class EventModifyBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            //id: params.EventId || 0,
+            id: this.props.EventId || 0,
             description : this.props.description || '',
-          //  name : params.name || '', //this shouldn't be blank
-          //  endDate: params.endDate || 0, //Dates will be held as ticks (milliSec)
-          //  startDate : params.startDate || 0,
+            name :  this.props.name || '', //this shouldn't be blank
+            endDate:  this.props.endDate || 1, //Dates will be held as millisecond ticks (and then parsed into js dates)
+            startDate :  this.props.startDate || 1,
             visible: this.props.seen || false,
         };
     }
 
-    componentWillMount(){
-        // Populate update box
-        // TODO:
-    }
-
-    PopulateEventEditor(eventId){
-            //TODO:
+    DeleteEvent(){
+        return(fetch( Settings.HOME_URL + '/organization/event/delete', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                Id: this.state.id
+            })
+        }));
     }
 
     ChangeEvent(event) {
+        console.log(this.state.id)
         let name = this.state.name;
         let description = this.state.description;
-        let endDate = this.state.endDate;
-        let startDate = this.state.startDate;
+        let endDate = this.state.endDate + new Date().getTimezoneOffset() * 60000;
+        let startDate = this.state.startDate + new Date().getTimezoneOffset() * 60000;
         let evtId = this.state.id;
         var that = this;
         return(fetch( Settings.HOME_URL + '/organization/event/modify', {
@@ -75,7 +80,6 @@ export class EventModifyBox extends React.Component {
 
 
     render() {
-      console.log('EventBox Modal rendered. Visable?', this.state.visible);
       return(
 
         <Modal
@@ -101,59 +105,63 @@ export class EventModifyBox extends React.Component {
                         value={this.state.description}
                     />
                 </View>
-                <View style= {styles.InputSpan}>
-                    <Text style= {styles.TInputLabel}>Start day / Time</Text>
-                    <DatePicker
-                        style={{width: 200}}
-                        date={this.state.startDate}
-                        mode ="datetime"
-                        format="MMMM DD YYYY h:mm:ss a"
-                        onDateChange={(date) => {this.setState({startDate: new Date(date).getTime()})}}
-                        confirmBtnText="Confirm"
-                        cancelBtnText="Cancel"
-                        placeholder="select a start date"
-                        customStyles={{
-                            dateIcon: {
-                                position: 'absolute',
-                                left: 0,
-                                top: 4,
-                                marginLeft: 0
-                            },
-                            dateInput: {
-                                marginLeft: 36
-                            }
-                            // ... You can check the source to find the other keys.
-                        }}
-                    />
+                <View style={[styles.FlexBoxContainerEvenRowSpacing, {paddingBottom: 15}]}>
+                    <View style= {styles.InputSpan}>
+                        <Text style= {styles.TInputLabel}>Start day / Time</Text>
+                        <DatePicker
+                            style={{width: 210}}
+                            date={new Date(this.state.startDate + new Date().getTimezoneOffset() * 60000)}
+                            mode ="datetime"
+                            format="MMMM DD YYYY h:mm a"
+                            onDateChange={(date) => {this.setState({startDate: new Date(date).getTime()})}}
+                            confirmBtnText="Confirm"
+                            cancelBtnText="Cancel"
+                            placeholder="select a start date"
+                            customStyles={{
+                                dateIcon: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 4,
+                                    marginLeft: 0
+                                },
+                                dateInput: {
+                                    marginLeft: 36
+                                }
+                                // ... You can check the source to find the other keys.
+                            }}
+                        />
+                    </View>
+                    <View style= {styles.InputSpan}>
+                        <Text style= {styles.TInputLabel}>End day / Time</Text>
+                        <DatePicker
+                            style={{width: 210}}
+                            date={new Date(this.state.endDate + new Date().getTimezoneOffset() * 60000)}
+                            mode ="datetime"
+                            format="MMMM DD YYYY h:mm a"
+                            onDateChange={(date) => {this.setState({endDate: new Date(date).getTime()})}}
+                            confirmBtnText="Confirm"
+                            cancelBtnText="Cancel"
+                            placeholder="select a end date"
+                            customStyles={{
+                                dateIcon: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 4,
+                                    marginLeft: 0
+                                },
+                                dateInput: {
+                                    marginLeft: 36
+                                }
+                                // ... You can check the source to find the other keys.
+                            }}
+                        />
+                    </View>
                 </View>
-                <View style= {styles.InputSpan}>
-                    <Text style= {styles.TInputLabel}>End day / Time</Text>
-                    <DatePicker
-                        style={{width: 200}}
-                        date={this.state.endDate}
-                        mode ="datetime"
-                        format="MMMM DD YYYY h:mm:ss a"
-                        onDateChange={(date) => {this.setState({endDate: new Date(date).getTime()})}}
-                        confirmBtnText="Confirm"
-                        cancelBtnText="Cancel"
-                        placeholder="select a end date"
-                        customStyles={{
-                            dateIcon: {
-                                position: 'absolute',
-                                left: 0,
-                                top: 4,
-                                marginLeft: 0
-                            },
-                            dateInput: {
-                                marginLeft: 36
-                            }
-                            // ... You can check the source to find the other keys.
-                        }}
-                    />
-                </View>
-
-                <Button title="Update Event" onPress={this.ChangeEvent.bind(this)} />
-                <Button title="Cancel" onPress={() => this.setState({visible: false})}  />
+                <Button title="Update Event"  color={'#6b52ae'}  onPress={this.ChangeEvent.bind(this)} />
+                <View style={styles.hr}/>
+                <Button title="Delete Event"  color={'#6b52ae'}  onPress={this.DeleteEvent.bind(this)} />
+                <View style={styles.hr}/>
+                <Button title="Cancel"  color={'#6b52ae'} onPress={() => this.setState({visible: false})}  />
           </View>
         </Modal>
 

@@ -18,7 +18,7 @@ export class DetailsScreen extends React.Component {
         calendarData: {},
         selected: null,
     };
-    this.colors = ['#00FFFF','#8B008B','#FFA500','springgreen','darkslateblue','seagreen','brown','darkgray','olive','deeppink'];
+    this.colors = ['#00FFFF','#8B008B','#FFA500','#00FF7F','#483d8b','#54ff9f','#A0522D','#a9a9a9','#808000','#ff1493'];
   }
 
   componentWillMount(){
@@ -65,12 +65,18 @@ export class DetailsScreen extends React.Component {
 
           <View style={styles.hr} />
 
-          <ScrollView style={{padding:15}}>
+          <ScrollView style={{paddingHorizontal:15, paddingBottom: 30}}>
                 {this.DayEvents()}
           </ScrollView>
       </View>
 
     );
+  }
+
+  PrettyDateRender(date){
+      var months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'August', 'Sep.', 'Oct.', 'Nov.', 'Dec.']
+      let day = new Date(date);
+      return months[day.getUTCMonth()] + ' ' + day.getUTCDate() + ', ' + day.getYear();
   }
 
   DayEvents(){
@@ -94,7 +100,7 @@ export class DetailsScreen extends React.Component {
 
       return (
           <View>
-            <Text style={[styles.TextTitle, {marginBottom: 10}]}>Events for {this.state.selected}</Text>
+            <Text style={[styles.TextTitle, {marginBottom: 10}]}>Events for {this.PrettyDateRender(this.state.selected)}</Text>
 
             {Object.getOwnPropertyNames(this.state.calendarData[day].events).map((org, i) =>
                 this.OrgEventList(org, i)

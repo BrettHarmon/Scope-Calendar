@@ -169,47 +169,34 @@ public class OrganizationController {
 	public ResponseEntity<?> ModifyEvent(@RequestBody @Valid ModifyEventCM evt, UriComponentsBuilder ucb, 
 									Model model) {
 		String error = "";
-		System.out.println("Event start time: " + evt.getEvent().getStartDate());
-		// Date time conversion
-		//DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss a");
-		/*System.out.println(userInput.startDate);
-		//DateTime startDate = formatter.parseDateTime(userInput.startDate);
-		DateTime endDate = formatter.parseDateTime(userInput.endDate);
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		// check if user is the owner (later change to has permission)
-		Organization organization = organizationRepository.findOne(userInput.getOrganizationId());
-		System.out.println(userInput.getOrganizationId());
-		if (user == null) {
-			System.out.println("heytherecowboy");
-			
+		Event edittedEvent = eventRepository.findOne(evt.event.getEventId());
+		if (edittedEvent == null) {
+			return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.BAD_REQUEST);
 		}
-		if (organization.getOwner().getUserId() != user.getUserId()) {
-			error = "You do not have permission to do that";
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+		if(evt.event.getName() != null && !evt.event.getName().isEmpty()) {
+			edittedEvent.setName(evt.event.getName());
 		}
-		//set fields then save
-		userInput.getEvent().setEndDate(endDate);
-		userInput.getEvent().setStartDate(startDate);
-		userInput.getEvent().setTimezoneOffset();
-		//saving an organization has to happen first for some reason
-		//if there are no events in an organization previously, initialize the set, then add the event and save
-		if (organization.getEvents() == null) {
-		organization.setEvents(new HashSet<Event>());
-		}
-		organization.getEvents().add(userInput.getEvent());
-		organizationRepository.save(organization);
-		userInput.getEvent().setOrganization(organizationRepository.findByName(organization.getName()));
-		eventRepository.save(userInput.getEvent());
+		edittedEvent.setDescription(evt.event.getDescription());
+		edittedEvent.setStartDate(evt.event.getStartDate());
+		edittedEvent.setEndDate(evt.event.getEndDate());
+		edittedEvent.setTimezoneOffset(); //find Time zone offset from dates set
 		
-*/
-		
-		
+		eventRepository.save(edittedEvent);
 		return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.OK);
 		
 		
 	}
 	
-	
+	@PostMapping(value = {"event/delete"}, produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> DeleteEvent(@RequestBody SimpleId eventId, UriComponentsBuilder ucb, 
+									Model model) {
+		if (eventId.getId() == 0) {
+			return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.BAD_REQUEST);
+		}
+		eventRepository.delete(eventId.getId());
+		return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.OK);
+	}
 	
 @GetMapping({"/search/{searchBox}"})
 	public ResponseEntity<?> searchOrganizations(@PathVariable List<String> searchBox) {

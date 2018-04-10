@@ -53,6 +53,12 @@ class OrganizationProfile extends React.Component {
             isAdmin: null,
             seeModal: false,
             ModalKey: 0,
+
+            evtId: 0,
+            evtStartMS: 1,
+            evtEndMS: 1,
+            evtName: '',
+            evtDesc: '',
         };
 
 
@@ -136,7 +142,7 @@ class OrganizationProfile extends React.Component {
                     var events = {};
                     var today = new Date();
 
-                    for (let i = -30; i < 31; i++) {
+                    for (let i = -3; i < 90; i++) {
                         let time = today.getTime() + i * 24 * 60 * 60 * 1000;
                         let strTime = utility.timeToString(time);
                         events[strTime] = [];
@@ -341,15 +347,24 @@ class OrganizationProfile extends React.Component {
                 />
 
 
-              <EventModifyBox key={this.state.ModalKey} seen={this.state.seeModal} EventId= {0} />
+            <EventModifyBox key={this.state.ModalKey} seen={this.state.seeModal}
+                 EventId= {this.state.evtId}
+                 name= {this.state.evtName}
+                 description={this.state.evtDesc}
+                 startDate= {this.state.evtStartMS}
+                 endDate={this.state.evtEndMS}/>
 
             </View>
         );
     }
 
     editEvent(event){
-      console.log('EventUpdate; revealing modal');
-      this.setState({ModalKey: Math.random(), seeModal: true});
+      this.setState({ModalKey: Math.random(), seeModal: true,
+                    evtId: event.eventId,
+                    evtName: event.event, evtDesc: event.description,
+                    evtStartMS: new Date(event.start).getTime(),
+                    evtEndMS: new Date(event.end).getTime()}
+                );
     }
 
     renderItem(item) {
@@ -359,7 +374,7 @@ class OrganizationProfile extends React.Component {
         let setHeight = Math.floor(minHeight+ (maxHeight-minHeight) * (hours/5));
         return (
             <View style={[styles.agendaItem, {height: setHeight}]}>
-                <Button title="Test Edit" onPress={() => this.editEvent(item)} />
+                <Button title="Test Edit" color={'#6b52ae'} style={{width: 150}} onPress={() => this.editEvent(item)} />
                 <Text style={{fontSize:16,  fontWeight: 'bold'}}>{item.event}</Text>
                 <Text style={{fontSize:14, fontWeight: 'bold'}}> {item.start.neatTime()} - {item.end.neatTime()} </Text>
                 <Text>{item.description}</Text>
