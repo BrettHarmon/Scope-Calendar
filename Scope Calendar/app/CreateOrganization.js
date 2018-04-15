@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
-import Tags from 'react-native-tags';
+import AutoTags from 'react-native-tag-autocomplete';
 
 var utility = require('./fnUtils.js');
 import * as Settings from './Settings.js' //Include on every page
@@ -29,14 +29,32 @@ class CreateOrganizationBox extends React.Component {
             name : '',
             description : '',
             tags: [],
+            customTag: '',
+            suggestions: [ {name: "thing"}, {name: "another"}, ],
             owner : '',
             generalErr:'',};
+    }
+
+    handleDelete = index => {
+        let tags = this.state.tags;
+        tags.splice(index, 1);
+        this.setState({ tags });
+    };
+
+    handleAddition = suggestion => {
+        this.setState({ tags: this.state.tags.concat([suggestion]) });
+    };
+
+    addCustomTag(event) {
+        this.setState({tags: this.state.tags.concat([{name: this.state.customTag}])  });
+
     }
 
     createOrganization(event) {
         let name = this.state.name;
         let description = this.state.description;
-        let tags = this.state.tags;
+        let tags = this.state.tags.map(object => object.name);
+        console.log(tags);
         var that = this;
         return(fetch( Settings.HOME_URL + '/organization/create', {
             method: 'POST',
@@ -102,14 +120,16 @@ class CreateOrganizationBox extends React.Component {
                 </View>
 
                 <View style= {styles.InputSpan}>
-                    <Text style= {styles.TInputLabel}>Description</Text>
-                    <Tags
-                        initialText=""
-                        initialTags={['dog', 'cat', 'chicken']}
-                        onChangeTags={() => console.log('')}
-                        onTagPress={(index, tagLabel, event) => console.log(index, tagLabel, event)}
-                        inputStyle={{ backgroundColor: 'white' }}
-                    />
+                    <Text style= {styles.TInputLabel}>Add Tags</Text>
+                    <AutoTags
+                        ref={input => { this.textInput = input }}
+                        suggestions={this.state.suggestions}
+                        tagsSelected={this.state.tags}
+                        handleAddition={this.handleAddition}
+                        handleDelete={this.handleDelete}
+                        onChangeText={(customTag) => {this.setState({customTag});}}
+                        placeholder="Add a Tag.." />
+                    <Button title="add tag" onPress={this.addCustomTag.bind(this)} />
                 </View>
 
                 <Button title="Create Organization" onPress={this.createOrganization.bind(this)} />

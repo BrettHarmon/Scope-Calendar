@@ -198,23 +198,51 @@ public class OrganizationController {
 		return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.OK);
 	}
 	
-@GetMapping({"/search/{searchBox}"})
-	public ResponseEntity<?> searchOrganizations(@PathVariable List<String> searchBox) {
+@GetMapping({"/searchByName/{searchBox}"})
+	public ResponseEntity<?> searchOrganizationsByName(@PathVariable String searchBox) {
 		
 		Set<Organization> organizations = new HashSet<Organization>(); 
-		if (searchBox.size() == 1) {
-		 organizations = organizationRepository.findByNameContainingIgnoreCase(searchBox.get(1));
+		if (!searchBox.isEmpty()) {
+		 organizations = organizationRepository.findByNameContainingIgnoreCase(searchBox);
 		}
-		Set<Tag> tags = tagRepository.findDistinctByNameIn(searchBox);
-		if (!tags.isEmpty()) {
-			organizations = organizationRepository.findByTags(tags);
-		}
-		
-		if (organizations.isEmpty()) { 
+		else { 
 			return ResponseEntity.status(HttpStatus.OK).body("There are no matching results");
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(organizations);
 	}
+
+@GetMapping({"/searchByTags/{searchBox}"})
+public ResponseEntity<?> searchOrganizationsbyTags(@PathVariable String[] searchBox) {
+	
+	Set<Organization> organizations = new HashSet<Organization>(); 
+	if (searchBox.length > 0) {
+	 Set<Tag> tags = tagRepository.findDistinctByNameIn(searchBox);
+	 
+	 if (tags.isEmpty()) {
+		 return ResponseEntity.status(HttpStatus.OK).body("There are no matching results");
+	 }
+	 
+	 organizations = organizationRepository.findByTagsIn(tags);
+	 
+	 
+	 return ResponseEntity.status(HttpStatus.OK).body(organizations);
+	 
+	}
+	else { 
+		return ResponseEntity.status(HttpStatus.OK).body("There are no matching results");
+	}
+	
+}
+
+@GetMapping({"/tags"})
+public ResponseEntity<?> getTags() {
+	
+	List<String> tags = new ArrayList<String>();
+	for (Tag tag : tagRepository.findAll()) {
+		tags.add(tag.getName());
+	}
+	return ResponseEntity.status(HttpStatus.OK).body(tags);
+}
 	
 	@GetMapping(value ={"subscribed"}, produces = "application/json")
 	@ResponseBody
