@@ -151,21 +151,24 @@ class SearchResultsBox extends React.Component {
     render() {
         let that = this;
         return (
-            <View style={styles.bodyView}>
+            <View style={styles.organizationOuterView}>
                 <Text>Search Organizations</Text>
                 <ScrollView>
                     {
                         this.state.organizations.map(function (item, i) {
-                            console.log(item.organizationId);
-                            return <View key={i}>
-                                <Button
-                                    title={item.name}
+                            console.log(item.description);
+                            return <View style={styles.organizationView} key={i}>
+                                <TouchableOpacity style={styles.organizationButton}
                                     onPress={() => {
                                         that.props.navigation.navigate('TestOrganizationProfile', {
                                             OrganizationId: item.organizationId
                                         });
-                                    }}
-                                />
+                                    }}>
+                                    <Text style={styles.organizationTitle}>{item.name}</Text>
+                                    <Text style={styles.organizationDescription}>{item.description}</Text>
+                                </TouchableOpacity>
+
+
                             </View>
                         })
                     }

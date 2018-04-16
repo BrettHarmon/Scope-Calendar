@@ -5,6 +5,7 @@ import { StyleSheet} from 'react-native';
 
 
 export const PURPLE = "#6b52ae";
+export const yee = "#ecd7ff";
 
 module.exports = StyleSheet.create({
     //FlexBox styling
@@ -100,4 +101,25 @@ module.exports = StyleSheet.create({
         marginRight: 10,
         marginTop: 17
       },
+    //organization search text styling
+    organizationTitle: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 14
+    },
+    organizationDescription: {
+        textAlign: 'center',
+        fontSize: 12
+    },
+    organizationView: {
+        width: 100,
+        justifyContent: 'center',
+        marginTop: 17
+    },
+    organizationOuterView: {
+        alignItems: 'center',
+    },
+    organizationButton: {
+        backgroundColor: "#ecd7ff",
+    }
 });
