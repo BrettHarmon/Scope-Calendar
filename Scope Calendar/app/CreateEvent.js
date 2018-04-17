@@ -106,7 +106,7 @@ class CreateEventBox extends React.Component {
                         style={{width: 200}}
                         date={this.state.startDate}
                         mode ="datetime"
-                        format="YYYY-MM-DD h:mm:ss a"
+                        format="YYYY-MM-DD h:mm a"
                         onDateChange={(date) => {this.setState({startDate: date})}}
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"
@@ -131,7 +131,7 @@ class CreateEventBox extends React.Component {
                         style={{width: 200}}
                         date={this.state.endDate}
                         mode ="datetime"
-                        format="YYYY-MM-DD h:mm:ss a"
+                        format="YYYY-MM-DD h:mm a"
                         onDateChange={(date) => {this.setState({endDate: date})}}
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"

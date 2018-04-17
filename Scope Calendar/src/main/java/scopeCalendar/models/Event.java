@@ -15,6 +15,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
@@ -38,6 +39,7 @@ public class Event implements Serializable {
     private long eventId;
 
     @Column(name = "name")
+    @NotEmpty(message = "*An event name is required.")
     private String name;
 
     @Column(name = "description", columnDefinition="TEXT")

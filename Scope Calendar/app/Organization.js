@@ -93,6 +93,7 @@ class OrganizationProfile extends React.Component {
     }
 
     componentDidMount() {
+        console.log("listener created")
         DeviceEventEmitter.addListener('refreshOrganization', (e)=>{
             this.getOrganization(this.props.Id)
         .then((org) => {
@@ -362,8 +363,8 @@ class OrganizationProfile extends React.Component {
       this.setState({ModalKey: Math.random(), seeModal: true,
                     evtId: event.eventId,
                     evtName: event.event, evtDesc: event.description,
-                    evtStartMS: new Date(event.start).getTime(),
-                    evtEndMS: new Date(event.end).getTime()}
+                    evtStartMS: new Date(event.start).getTime() + new Date().getTimezoneOffset() * 60000,
+                    evtEndMS: new Date(event.end).getTime()+ new Date().getTimezoneOffset() * 60000}
                 );
     }
 

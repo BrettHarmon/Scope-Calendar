@@ -20,6 +20,7 @@ export class EventModifyBox extends React.Component {
             endDate:  this.props.endDate || 1, //Dates will be held as millisecond ticks (and then parsed into js dates)
             startDate :  this.props.startDate || 1,
             visible: this.props.seen || false,
+            errors: [],
         };
     }
 
@@ -32,16 +33,16 @@ export class EventModifyBox extends React.Component {
             },
             body: JSON.stringify({
                 Id: this.state.id
-            })
-        }));
+                })
+            }).then(() => {this.setState({visible: false})})
+        );
     }
 
     ChangeEvent(event) {
-        console.log(this.state.id)
         let name = this.state.name;
         let description = this.state.description;
-        let endDate = this.state.endDate + new Date().getTimezoneOffset() * 60000;
-        let startDate = this.state.startDate + new Date().getTimezoneOffset() * 60000;
+        let endDate = this.state.endDate;
+        let startDate = this.state.startDate;
         let evtId = this.state.id;
         var that = this;
         return(fetch( Settings.HOME_URL + '/organization/event/modify', {
@@ -63,7 +64,7 @@ export class EventModifyBox extends React.Component {
             .then((response) => {
                 if (!response.ok) {
                     response.json().then(function(data){
-                        //Error has occured (lord forgive me for the sloppiness)
+                        that.setState({errors: data})
 
                     });
                 }
@@ -87,7 +88,11 @@ export class EventModifyBox extends React.Component {
           transparent={false}
           visible={this.state.visible}
           onRequestClose={() => this.setState({visible: false})}  >
-          <View style={{flex: 1, marginTop: 22}}>
+
+            <View style={{flex: 1, marginTop: 22}}>
+                <View>
+                    {this.state.errors.map((err) => <Text style={styles.hiddenError} key= {Math.random()}>{err}</Text>)}
+                </View>
                 <View style= {styles.InputSpan}>
                     <Text style= {styles.TInputLabel}>Name</Text>
                     <TextInput
@@ -110,7 +115,7 @@ export class EventModifyBox extends React.Component {
                         <Text style= {styles.TInputLabel}>Start day / Time</Text>
                         <DatePicker
                             style={{width: 210}}
-                            date={new Date(this.state.startDate + new Date().getTimezoneOffset() * 60000)}
+                            date={new Date(this.state.startDate)}
                             mode ="datetime"
                             format="MMMM DD YYYY h:mm a"
                             onDateChange={(date) => {this.setState({startDate: new Date(date).getTime()})}}
@@ -135,7 +140,7 @@ export class EventModifyBox extends React.Component {
                         <Text style= {styles.TInputLabel}>End day / Time</Text>
                         <DatePicker
                             style={{width: 210}}
-                            date={new Date(this.state.endDate + new Date().getTimezoneOffset() * 60000)}
+                            date={new Date(this.state.endDate)}
                             mode ="datetime"
                             format="MMMM DD YYYY h:mm a"
                             onDateChange={(date) => {this.setState({endDate: new Date(date).getTime()})}}

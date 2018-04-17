@@ -19,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -130,7 +132,7 @@ public class OrganizationController {
 									Model model) {
 		String error = "";
 		// Date time conversion
-		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss a");
+		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd h:mm a");
 		System.out.println(userInput.startDate);
 		DateTime startDate = formatter.parseDateTime(userInput.startDate);
 		DateTime endDate = formatter.parseDateTime(userInput.endDate);
@@ -166,12 +168,26 @@ public class OrganizationController {
 	
 	@PostMapping(value = {"event/modify"}, produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<?> ModifyEvent(@RequestBody @Valid ModifyEventCM evt, UriComponentsBuilder ucb, 
-									Model model) {
-		String error = "";
+	public ResponseEntity<?> ModifyEvent(@RequestBody @Valid ModifyEventCM evt,BindingResult bindingResult, Model model) {
+		
+		List<String> errors = new ArrayList<>();
+		
+		//Parse through errors directed from field annotations (requirements eg: notEmpty) 
+		if (bindingResult.hasErrors()) {
+			for( FieldError error : bindingResult.getFieldErrors()) {
+				errors.add(error.getDefaultMessage());
+			}
+		}
+		if(evt.getEvent().getStartDate().isAfter(evt.getEvent().getEndDate())) {
+			errors.add("A start time must come before the end time.");
+		}
+		if(!errors.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+		}
+		
 		Event edittedEvent = eventRepository.findOne(evt.event.getEventId());
 		if (edittedEvent == null) {
-			return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.BAD_REQUEST);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
 		}
 		if(evt.event.getName() != null && !evt.event.getName().isEmpty()) {
 			edittedEvent.setName(evt.event.getName());
@@ -182,7 +198,7 @@ public class OrganizationController {
 		edittedEvent.setTimezoneOffset(); //find Time zone offset from dates set
 		
 		eventRepository.save(edittedEvent);
-		return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(true);
 		
 		
 	}
@@ -192,10 +208,10 @@ public class OrganizationController {
 	public ResponseEntity<?> DeleteEvent(@RequestBody SimpleId eventId, UriComponentsBuilder ucb, 
 									Model model) {
 		if (eventId.getId() == 0) {
-			return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.BAD_REQUEST);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
 		}
 		eventRepository.delete(eventId.getId());
-		return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(true);
 	}
 	
 @GetMapping({"/searchByName/{searchBox}"})

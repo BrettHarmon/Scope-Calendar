@@ -12,7 +12,6 @@ var Storage = require('./IStorage.js');
 import * as Settings from './Settings.js' //Include on every page
 import { LoadingSpinner } from './components/loadingSpinner.js'
 import { CreateAccountScreen } from './CreateAccount'
-import { DetailsScreen } from './Home'
 import { LoggedInHome, NotLoggedInHome } from './Home'
 import { LoginScreen } from './Login'
 import { OrganizationProfileScreen} from "./Organization";
@@ -20,6 +19,8 @@ import {CreateOrganizationScreen} from "./CreateOrganization";
 import {OrganizationListScreen} from "./OrganizationList";
 import {CreateEventScreen} from "./CreateEvent";
 import {SearchScreen} from "./Search";
+
+import{ testView } from './Home'
 
 
 /*
@@ -163,9 +164,6 @@ const RootStack = StackNavigator(
         Home: {
             screen: HomeScreen,
         },
-        Details: {
-            screen: DetailsScreen,
-        },
         CreateAccount: {
             screen: CreateAccountScreen,
         },
@@ -190,6 +188,9 @@ const RootStack = StackNavigator(
         Search: {
             screen: SearchScreen,
         },
+        Playground: {
+            screen: testView,
+        }
     },
     {
         initialRouteName: 'Home',
@@ -210,16 +211,12 @@ const Drawer = DrawerNavigator({
         Stack: {
             screen: RootStack,
         },
-        //TestOrganizationProfile :{
-        //    screen: OrganizationProfileScreen
-        //},
-        Details: {
-            screen: DetailsScreen,
-        },
-
         Search: {
             screen: SearchScreen,
         },
+        Playground: {
+            screen: testView,
+        }
         //CreateAccount: {
         //    screen: CreateAccountScreen,
         //},
