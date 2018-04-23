@@ -375,7 +375,7 @@ class OrganizationProfile extends React.Component {
         let setHeight = Math.floor(minHeight+ (maxHeight-minHeight) * (hours/5));
         return (
             <View style={[styles.agendaItem, {height: setHeight}]}>
-                <Button title="Test Edit" color={'#6b52ae'} style={{width: 150}} onPress={() => this.editEvent(item)} />
+                <Iconz name="md-create" size={28} onPress={() => this.editEvent(item)} style={{alignSelf: 'flex-end'}}/>
                 <Text style={{fontSize:16,  fontWeight: 'bold'}}>{item.event}</Text>
                 <Text style={{fontSize:14, fontWeight: 'bold'}}> {item.start.neatTime()} - {item.end.neatTime()} </Text>
                 <Text>{item.description}</Text>

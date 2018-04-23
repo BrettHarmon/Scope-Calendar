@@ -36,6 +36,9 @@ export class LoggedInHome extends React.Component {
                 });
 
             }else{
+                this.setState({
+                    ready:true
+                });
                 console.log('No events returned from userEventFetch')
             }
           })
