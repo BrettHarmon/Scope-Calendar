@@ -99,7 +99,7 @@ export class LoggedInHome extends React.Component {
       if(!this.state.calendarData[day].events){
             return(
                 <View>
-                  <Text style={[styles.TextTitle, {marginBottom: 10}]}>There are no events on {this.PrettyDateRender(this.state.selected)}.</Text>
+                  <Text style={[styles.TextTitle, {marginBottom: 10}]}>No events planned on {this.PrettyDateRender(this.state.selected)}.</Text>
                 </View>
             )
       }

@@ -56,9 +56,14 @@ public class OrganizationController {
 	
 	//Get logged in user helper
 	private User getUser() {
-		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication(); 
-		String username = loggedInUser.getName(); 
-		return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username); 
+		Authentication UserAuth = SecurityContextHolder.getContext().getAuthentication();
+		String username = null;
+		if(UserAuth.getPrincipal() instanceof User) {
+			username = ((User) UserAuth.getPrincipal()).getUsername();
+		}else if(UserAuth.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+			username = ((org.springframework.security.core.userdetails.User) UserAuth.getPrincipal()).getUsername();
+		}
+		return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username);
 	}
 	
 

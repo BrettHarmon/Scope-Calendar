@@ -45,8 +45,13 @@ public class UserController {
 	
 	//helper function to get logged in user
 	public User getUser() {
-		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-		String username = loggedInUser.getName();
+		Authentication UserAuth = SecurityContextHolder.getContext().getAuthentication();
+		String username = null;
+		if(UserAuth.getPrincipal() instanceof User) {
+			username = ((User) UserAuth.getPrincipal()).getUsername();
+		}else if(UserAuth.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+			username = ((org.springframework.security.core.userdetails.User) UserAuth.getPrincipal()).getUsername();
+		}
 		return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username);
 	}
 	

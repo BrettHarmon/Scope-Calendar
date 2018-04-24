@@ -373,9 +373,13 @@ class OrganizationProfile extends React.Component {
         //Map differing time lengths to height on agenda (Max out at 5 hours)
         let hours = (item.end.getTime() - item.start.getTime()) /3600000;
         let setHeight = Math.floor(minHeight+ (maxHeight-minHeight) * (hours/5));
+        let editbutton = null;
+        if(this.state.isAdmin){
+            editbutton = <Iconz name="md-create" size={28} onPress={() => this.editEvent(item)} style={{alignSelf: 'flex-end'}}/>;
+        }
         return (
             <View style={[styles.agendaItem, {height: setHeight}]}>
-                <Iconz name="md-create" size={28} onPress={() => this.editEvent(item)} style={{alignSelf: 'flex-end'}}/>
+                {editbutton}
                 <Text style={{fontSize:16,  fontWeight: 'bold'}}>{item.event}</Text>
                 <Text style={{fontSize:14, fontWeight: 'bold'}}> {item.start.neatTime()} - {item.end.neatTime()} </Text>
                 <Text>{item.description}</Text>

@@ -47,7 +47,7 @@ public class Organization implements Serializable {
     		  inverseJoinColumns=@JoinColumn(name="userId")
         )
 	@JsonIgnore
-	private Set<User> subbedUsers;
+	private Set<User> subbedUsers = new HashSet<>();
 	
 	@ManyToMany(targetEntity=Tag.class)
     @JoinTable(
@@ -56,7 +56,7 @@ public class Organization implements Serializable {
     		  inverseJoinColumns=@JoinColumn(name="tagId")
         )
 	@JsonIgnore
-	private Set<Tag> tags;
+	private Set<Tag> tags = new HashSet<>();
 	
 	public Set<Tag> getTags() {
 		return tags;
@@ -68,7 +68,7 @@ public class Organization implements Serializable {
 
 	@OneToMany(mappedBy = "organization")
 	@JsonIgnore
-	private Set<Event> events;
+	private Set<Event> events = new HashSet<>();
 	
 	@Column(name = "private")
 	private boolean isPrivate = false; 
