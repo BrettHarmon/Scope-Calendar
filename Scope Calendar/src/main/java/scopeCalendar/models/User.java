@@ -2,7 +2,10 @@ package scopeCalendar.models;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -47,12 +50,17 @@ public class User implements Serializable {
 	
 	@ManyToMany(mappedBy = "subbedUsers") //Junction table created on Organization.subbedUsers 
 	@JsonIgnore
-	private Set<Organization> subscribedOrganizations;
+	private Set<Organization> subscribedOrganizations = new HashSet<>();
 	
+	@ManyToMany(mappedBy = "privateUsers") //Junction table created on Organization.subbedUsers 
+	@JsonIgnore
+	private Map<Organization, Boolean> privateOrganizations = new HashMap<Organization, Boolean>();
+	
+
 	@Transient
 	@OneToMany(mappedBy="owner")
 	@JsonIgnore
-    private Set<Organization> orgs;
+    private Set<Organization> orgs = new HashSet<>();
     
 	public Set<Organization> getOwnedOrganizations() {
 		return orgs;
@@ -110,6 +118,14 @@ public class User implements Serializable {
 
 	public void setSubscribedOrganizations(Set<Organization> subscribedOrganizations) {
 		this.subscribedOrganizations = subscribedOrganizations;
+	}
+	
+	public Map<Organization, Boolean> getPrivateOrganizations() {
+		return privateOrganizations;
+	}
+
+	public void setPrivateOrganizations(Map<Organization, Boolean> privateOrganizations) {
+		this.privateOrganizations = privateOrganizations;
 	}
 
 }

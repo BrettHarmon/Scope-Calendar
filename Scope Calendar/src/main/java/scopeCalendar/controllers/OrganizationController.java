@@ -356,6 +356,92 @@ public ResponseEntity<?> getTags() {
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = {"requestInvitation"}, consumes = "application/json", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> requestPrivateInvitation(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
+									Model model) {
+		
+		User user = getUser();
+		Organization org = organizationRepository.getOne(idObj.getId());
+		
+		if(user == null || org == null) {
+			return new ResponseEntity<Object>("Error finding organization or user", HttpStatus.BAD_REQUEST);
+		}
+		
+		if (org.getPrivateUsers().containsKey(user)) {
+			return new ResponseEntity<Object>("You have already requested an invitation to this Organization", HttpStatus.BAD_REQUEST);
+		}
+		
+		org.requestInvite(user);
+		organizationRepository.save(org);
+		return new ResponseEntity<Object>("You have requested an invitation to this Organization", HttpStatus.OK);
+	}
+	
+	@PostMapping(value = {"sendInvitation"}, consumes = "application/json", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> sendPrivateInvitation(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
+									Model model) {
+		
+		User user = getUser();
+		Organization org = organizationRepository.getOne(idObj.getId());
+		
+		if(user == null || org == null) {
+			return new ResponseEntity<Object>("Error finding organization or user", HttpStatus.BAD_REQUEST);
+		}
+		
+		if (org.getPrivateUsers().containsKey(user)) {
+			return new ResponseEntity<Object>("This user is already on the invite list", HttpStatus.BAD_REQUEST);
+		}
+		
+		org.sendInvite(user);
+		organizationRepository.save(org);
+		return new ResponseEntity<Object>("You have sent an invitation to the user", HttpStatus.OK);
+	}
+	
+	@PostMapping(value = {"acceptInvitation"}, consumes = "application/json", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> acceptPrivateInvitation(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
+									Model model) {
+		
+		User user = getUser();
+		Organization org = organizationRepository.getOne(idObj.getId());
+		
+		if(user == null || org == null) {
+			return new ResponseEntity<Object>("Error finding organization or user", HttpStatus.BAD_REQUEST);
+		}
+		
+		if (org.getOwner() != user) {
+			return new ResponseEntity<Object>("You are not the owner of this organization", HttpStatus.BAD_REQUEST);
+		}
+		
+		org.acceptInvite(user);
+		organizationRepository.save(org);
+		return new ResponseEntity<Object>("You have accepted this user to the organization", HttpStatus.OK);
+	}
+	
+	@PostMapping(value = {"declineInvitation"}, consumes = "application/json", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<?> declinePrivateInvitation(@RequestBody SimpleId idObj, UriComponentsBuilder ucb, 
+									Model model) {
+		
+		User user = getUser();
+		Organization org = organizationRepository.getOne(idObj.getId());
+		
+		if(user == null || org == null) {
+			return new ResponseEntity<Object>("Error finding organization or user", HttpStatus.BAD_REQUEST);
+		}
+		
+		if (org.getOwner() != user) {
+			return new ResponseEntity<Object>("You are not the owner of this organization", HttpStatus.BAD_REQUEST);
+		}
+		
+		org.declineInvite(user);
+		organizationRepository.save(org);
+		return new ResponseEntity<Object>("You have denied this user access to the organization", HttpStatus.OK);
+	}
+	
+	
+	
 	// Method responsible for modifying organization's description
 	@PostMapping(value = {"updateDescription"}, consumes = "application/json", produces = "application/json")
 	@ResponseBody

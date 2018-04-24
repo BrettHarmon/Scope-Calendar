@@ -1,7 +1,9 @@
 package scopeCalendar.models;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -16,7 +18,6 @@ public class Organization implements Serializable {
 	private static final long serialVersionUID = -5513950805803868005L;
 	
 	public Organization() {
-		this.tags = new HashSet<Tag>();
 	}
 	
 	@Id
@@ -49,6 +50,15 @@ public class Organization implements Serializable {
 	@JsonIgnore
 	private Set<User> subbedUsers = new HashSet<>();
 	
+	@ManyToMany(targetEntity=User.class)
+    @JoinTable(
+          name="user_private_organization_junction",
+    		  joinColumns=@JoinColumn(name="organizationId"),
+    		  inverseJoinColumns=@JoinColumn(name="userId")
+        )
+	@JsonIgnore
+	private Map<User, Boolean> privateUsers = new HashMap<User, Boolean>();
+
 	@ManyToMany(targetEntity=Tag.class)
     @JoinTable(
           name="tag_organization_junction",
@@ -142,6 +152,34 @@ public class Organization implements Serializable {
 
 	public boolean getPrivate()
 	{
+		return isPrivate;
+	}
+	
+	public Map<User, Boolean> getPrivateUsers() {
+		return privateUsers;
+	}
+
+	public void setPrivateUsers(Map<User, Boolean> privateUsers) {
+		this.privateUsers = privateUsers;
+	}
+	
+	public void requestInvite(User user) {
+		this.privateUsers.put(user, false);
+	}
+	
+	public void sendInvite(User user) {
+		this.privateUsers.put(user,  true);
+	}
+	
+	public void acceptInvite(User user) {
+		this.privateUsers.put(user, true);
+	}
+	
+	public void declineInvite(User user) {
+		this.privateUsers.remove(user);
+	}
+
+	public boolean isPrivate() {
 		return isPrivate;
 	}
 	
