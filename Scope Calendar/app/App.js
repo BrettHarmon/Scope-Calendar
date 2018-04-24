@@ -51,6 +51,7 @@ class HomeHeader extends React.Component {
 }
 
 class HomeScreen extends React.Component {
+
     static navigationOptions = ({navigation}) => ({
         drawerLabel: () => null,
         headerTitle: (
@@ -61,13 +62,11 @@ class HomeScreen extends React.Component {
                 <Iconz name="md-menu" color ="#fff" size={28} style={{marginLeft: 10}}/>
             </TouchableOpacity>
         ),
-        headerRight: (
-            <TouchableOpacity  onPress={() => navigation.navigate('OrganizationList')}>
-                <Iconz name="md-school" color ="#fff" size={28} style={{marginRight: 20}}/>
-            </TouchableOpacity>
-        )
+        headerRight:  typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.subscribedOrganizations) ===
+         'undefined' ? '': navigation.state.params.subscribedOrganizations
 
     });
+
 
     constructor(props) {
         super(props);
