@@ -94,7 +94,7 @@ module.exports = StyleSheet.create({
         paddingTop: 30
     },
     agendaItem: {
-        backgroundColor: 'white',
+        backgroundColor: '#9e8ec9',
         flex: 1,
         borderRadius: 5,
         padding: 10,

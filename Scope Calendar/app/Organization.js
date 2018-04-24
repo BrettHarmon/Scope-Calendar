@@ -61,10 +61,9 @@ class OrganizationProfile extends React.Component {
             evtDesc: '',
         };
 
-
     }
 
-    componentWillMount(){
+    buildOrganization(){
         this.getOrganization(this.props.Id)
             .then((org) => {
                 if (!!org){ //org object exists (not undefined/null/empty string)
@@ -86,40 +85,24 @@ class OrganizationProfile extends React.Component {
                         isPrivate: org.isPrivate,
                         isAdmin: org.isAdmin,
                     });
+
                 }else{
                     this.setState({ ready: true });
                 }
             })
     }
 
+    componentWillMount(){
+        this.buildOrganization();
+    }
+
     componentDidMount() {
         console.log("listener created")
         DeviceEventEmitter.addListener('refreshOrganization', (e)=>{
-            this.getOrganization(this.props.Id)
-        .then((org) => {
-                if (!!org){ //org object exists (not undefined/null/empty string)
-                    this.props.navigation.setParams({ title: org.name });
-                    if(org.isAdmin){
-                        this.props.navigation.setParams({
-                            addEvent:<TouchableOpacity  onPress={() => this.props.navigation.navigate('CreateEvent', {Id : this.props.Id})}>
-                                            <Iconz name="md-add" color ="white" size={28} style={{marginRight: 20}}/>
-                                    </TouchableOpacity>, });
-                    }
-                    this.setState({
-                        name: org.name,
-                        subscribed: org.isSubbed,
-                        description: org.description,
-                        ready: true,
-                        subscribers: org.subs,
-                        upcomingEvents: org.upcomingEvents,
-                        selected: org.firstEvent,
-                        isPrivate: org.isPrivate,
-                        isAdmin: org.isAdmin,
-                    });
-                }else{
-                    this.setState({ ready: true });
-                }
-            })
+            if(this.refs.OrganizationRef){
+                this.setState({upcomingEvents: {}});
+                this.buildOrganization();
+            }
         });
     }
 
@@ -296,7 +279,7 @@ class OrganizationProfile extends React.Component {
         yesterday.setDate(yesterday.getDate() - 1);
         var wide = Dimensions.get('window').width;
         return (
-            <View style={styles.bodyView}>
+            <View style={styles.bodyView} ref="OrganizationRef">
                 <View style={{ justifyContent:'space-between', flexDirection:'row', alignItems: 'stretch'}}>
                     <Text style={{paddingTop: 15, marginLeft: 15, fontSize:14}}>Current subscribers: {this.state.subscribers.numberWithCommas()}</Text>
                     {this.SubscribeButton()}

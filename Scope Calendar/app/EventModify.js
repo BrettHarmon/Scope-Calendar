@@ -1,6 +1,6 @@
 import React from 'react';
 import {TextInput, StyleSheet, Text, View, TouchableHighlight,
-   Modal, Animated, Button} from 'react-native';
+   Modal, Animated, Button, DeviceEventEmitter} from 'react-native';
 import DatePicker from 'react-native-datepicker';
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
@@ -25,6 +25,7 @@ export class EventModifyBox extends React.Component {
     }
 
     DeleteEvent(){
+        var that = this;
         return(fetch( Settings.HOME_URL + '/organization/event/delete', {
             method: 'POST',
             headers: {
@@ -34,7 +35,10 @@ export class EventModifyBox extends React.Component {
             body: JSON.stringify({
                 Id: this.state.id
                 })
-            }).then(() => {this.setState({visible: false})})
+            }).then(() => {
+                DeviceEventEmitter.emit('refreshOrganization');
+                that.setState({visible:false});
+            })
         );
     }
 
@@ -72,7 +76,7 @@ export class EventModifyBox extends React.Component {
                     response.json().then(function (json) {
                         // return back to organization page
                         DeviceEventEmitter.emit('refreshOrganization');
-                        that.props.navigation.pop();
+                        that.setState({visible:false});
                     });
                 }
             }))

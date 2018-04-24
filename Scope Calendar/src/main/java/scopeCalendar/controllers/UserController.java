@@ -139,11 +139,12 @@ public class UserController {
 		String error = "";
 		User user = getUser();
 		
-		HashMap<String, Set<Event>> result = new HashMap<>();
+		HashMap<String, Object> result = new HashMap<>();
 		List<Organization> subbedOrgs = new LinkedList<Organization>(user.getSubscribedOrganizations());
 		
 		for(Organization org : subbedOrgs) {
 			result.put(org.getName(), org.getEvents());
+			result.put(org.getName()+"#", org.getOrganizationId());
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}

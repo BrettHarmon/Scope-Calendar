@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {Button, Dimensions, ScrollView, Text, View, AsyncStorage} from 'react-native';
+import {Button, Dimensions, ScrollView, Text, View, AsyncStorage, TouchableOpacity} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import update from 'immutability-helper';
 
@@ -117,14 +117,20 @@ export class LoggedInHome extends React.Component {
   }
   OrgEventList(name, i){
       var backgroundColor = this.state.calendarData[this.state.selected].dots.find(dots => dots.key == name).color;
-      let childBG = backgroundColor + '66' //Add a .4 opacity
-      backgroundColor += 'A6' //Add a .65 opacity
+      var orgId = this.state.calendarData[this.state.selected].dots.find(dots => dots.key == name).orgID;
+      let childBG = backgroundColor + 'A6' //Add a .65 opacity
+      backgroundColor += '66' //Add a .4 opacity
+      let that = this;
       return (
           <View key={i} style={{paddingHorizontal: 20, borderRadius: 7, borderWidth: 1.5, backgroundColor: backgroundColor}}>
+              <TouchableOpacity
+                  onPress = {() => { that.props.navigation.navigate('TestOrganizationProfile',
+                                {OrganizationId: orgId}); }}>
               <Text style= {{textAlign:'center', fontSize:20, paddingVertical: 10}}>{name}</Text>
               {this.state.calendarData[this.state.selected].events[name].map((evt, j) =>
                   this.EventItem(evt,j,childBG)
                 )}
+                </TouchableOpacity>
           </View>
 
       )
@@ -147,7 +153,6 @@ export class LoggedInHome extends React.Component {
           .then((response) => {
               if(response.ok) {
                   return response.json().then(function (body) {
-                      //console.log(body);
                       return body;
                     })
                 }
@@ -172,11 +177,16 @@ export class LoggedInHome extends React.Component {
       }
   */
   parseEvents(events){
+    let IDsymbol = '#';
     let today = new Date();
     let data = {};
     Object.getOwnPropertyNames(events).forEach((orgs, idx) => {
         var orgName = orgs;
-        let orgInfo = {key:orgName, color: this.colors[idx], colorIndex: idx};
+        if(orgName.endsWith(IDsymbol)){
+            return;
+        }
+        let id= events[orgName+IDsymbol];
+        let orgInfo = {key:orgName, orgID: id, color: this.colors[idx], colorIndex: idx};
 
         events[orgName].forEach((event) => {
             let dayKey = new Date(event.startDate.millis+ (event.timezoneOffset *3600000)).UTCToString();
