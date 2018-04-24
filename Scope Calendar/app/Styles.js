@@ -35,6 +35,14 @@ module.exports = StyleSheet.create({
         backgroundColor: '#eee'
     },
 
+    largeText: {
+        fontSize: 30,
+        textAlign: 'center',
+        borderColor: '#bbb',
+        padding: 10,
+        backgroundColor: '#eee'
+    },
+
 
     SubscribeButton:{
         borderRadius: 6,
@@ -82,10 +90,11 @@ module.exports = StyleSheet.create({
         flex: 1,
         marginHorizontal: 20,
         marginVertical: 10,
-        backgroundColor: '#fff',
+        backgroundColor: '#eee',
     },
     container: {
         flex: 1,
+        backgroundColor: '#eee',
     },
 
     agendaEmptyDate: {
@@ -105,21 +114,24 @@ module.exports = StyleSheet.create({
     organizationTitle: {
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 14
+        fontSize: 20
     },
     organizationDescription: {
         textAlign: 'center',
-        fontSize: 12
+        fontSize: 16
     },
     organizationView: {
-        width: 100,
         justifyContent: 'center',
-        marginTop: 17
+        marginTop: 17,
+
     },
     organizationOuterView: {
-        alignItems: 'center',
+        alignItems: 'stretch',
     },
     organizationButton: {
-        backgroundColor: "#ecd7ff",
+
+        minHeight: 100,
+        backgroundColor: "#ffffff",
+        flex: 1,
     }
 });
