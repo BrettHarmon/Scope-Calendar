@@ -1,8 +1,10 @@
 
 import React from 'react';
-import {Button, Dimensions, ScrollView, Text, View, AsyncStorage} from 'react-native';
+import {Button, Dimensions, ScrollView, Text, View, AsyncStorage, TouchableOpacity} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import update from 'immutability-helper';
+import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
+
 
 var styles = require('./Styles.js');
 var utility = require('./fnUtils.js');
@@ -18,11 +20,15 @@ export class LoggedInHome extends React.Component {
         calendarData: {},
         selected: null,
     };
+      this.props.navigation.setParams({subscribedOrganizations:<TouchableOpacity  onPress={() => this.props.navigation.navigate('OrganizationList')}>
+          <Iconz name="md-school" color ="#fff" size={28} style={{marginRight: 20}}/>
+      </TouchableOpacity>})
     this.colors = ['#00FFFF','#8B008B','#FFA500','#00FF7F','#483d8b','#54ff9f','#A0522D','#a9a9a9','#808000','#ff1493'];
   }
-  static navigationOptions = {
-      title: 'Home'
-  }
+
+
+
+
 
   componentWillMount(){
       this.UserEventFetch()
