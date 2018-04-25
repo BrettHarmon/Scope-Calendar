@@ -52,11 +52,6 @@ public class User implements Serializable {
 	@JsonIgnore
 	private Set<Organization> subscribedOrganizations = new HashSet<>();
 	
-	@ManyToMany(mappedBy = "privateUsers") //Junction table created on Organization.subbedUsers 
-	@JsonIgnore
-	private Map<Organization, Boolean> privateOrganizations = new HashMap<Organization, Boolean>();
-	
-
 	@Transient
 	@OneToMany(mappedBy="owner")
 	@JsonIgnore
@@ -118,14 +113,6 @@ public class User implements Serializable {
 
 	public void setSubscribedOrganizations(Set<Organization> subscribedOrganizations) {
 		this.subscribedOrganizations = subscribedOrganizations;
-	}
-	
-	public Map<Organization, Boolean> getPrivateOrganizations() {
-		return privateOrganizations;
-	}
-
-	public void setPrivateOrganizations(Map<Organization, Boolean> privateOrganizations) {
-		this.privateOrganizations = privateOrganizations;
 	}
 
 }

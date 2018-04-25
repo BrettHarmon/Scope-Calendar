@@ -50,12 +50,7 @@ public class Organization implements Serializable {
 	@JsonIgnore
 	private Set<User> subbedUsers = new HashSet<>();
 	
-	@ManyToMany(targetEntity=User.class)
-    @JoinTable(
-          name="user_private_organization_junction",
-    		  joinColumns=@JoinColumn(name="organizationId"),
-    		  inverseJoinColumns=@JoinColumn(name="userId")
-        )
+	@ElementCollection
 	@JsonIgnore
 	private Map<User, Boolean> privateUsers = new HashMap<User, Boolean>();
 
