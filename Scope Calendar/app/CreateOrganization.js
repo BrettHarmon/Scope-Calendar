@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, DeviceEventEmitter, CheckBox } from 'react-native';
 import {StackNavigator} from 'react-navigation';
 import * as Keychain from 'react-native-keychain';
 import AutoTags from 'react-native-tag-autocomplete';
@@ -30,6 +30,7 @@ class CreateOrganizationBox extends React.Component {
             description : '',
             tags: [],
             customTag: '',
+            isPrivate: false,
             suggestions: [ {name: "thing"}, {name: "another"}, ],
             owner : '',
             generalErr:'',};
@@ -53,6 +54,7 @@ class CreateOrganizationBox extends React.Component {
     createOrganization(event) {
         let name = this.state.name;
         let description = this.state.description;
+        let isPrivate = this.state.isPrivate;
         let tags = this.state.tags.map(object => object.name);
         console.log(tags);
         var that = this;
@@ -66,6 +68,7 @@ class CreateOrganizationBox extends React.Component {
                 organization:{
                     name: name,
                     description: description,
+                    isPrivate: isPrivate,
                 },
                 tags: tags,
             })
@@ -118,6 +121,19 @@ class CreateOrganizationBox extends React.Component {
                         value={this.state.description}
                     />
                 </View>
+
+                <View style={{ flexDirection: 'column'}}>
+                    <View style={{ flexDirection: 'row' }}>
+                        <CheckBox
+                            value={this.state.isPrivate}
+                            onValueChange={() => this.setState({ isPrivate: !this.state.isPrivate })}
+                        />
+                        <Text style={{marginTop: 5}}> Private</Text>
+                    </View>
+
+                </View>
+
+
 
                 <View style= {styles.InputSpan}>
                     <Text style= {styles.TInputLabel}>Add Tags</Text>

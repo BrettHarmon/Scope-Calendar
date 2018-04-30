@@ -76,13 +76,18 @@ public class OrganizationController {
 			error = "An Organization with that name already exists";
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 		}
-		System.out.println(userInput.getOrganization().getDescription() + userInput.getOrganization().getName());
+		System.out.println(userInput.getOrganization().isPrivate());
 		User user = getUser();
 		userInput.getOrganization().setOwner(user);
 		// initialize the organization subbed users set
 		userInput.getOrganization().setSubbedUsers(new HashSet<User>());
 		userInput.getOrganization().setEvents(new HashSet<Event>());
 		userInput.getOrganization().addSubscriber(user);
+		
+		//add owner to private list if organization is private
+		if (userInput.getOrganization().isPrivate()) {
+		userInput.getOrganization().sendInvite(user);
+		}
 		
 		//this is tag creation
 		for (String tagName: userInput.getTags()) {
@@ -297,7 +302,7 @@ public ResponseEntity<?> getTags() {
 		result.setName(org.getName());
 		result.setDescription(org.getDescription());
 		result.setSubscribers(String.valueOf(org.getSubbedUsers().size()));
-		result.setIsPrivate(String.valueOf(org.getPrivate()));
+		result.setIsPrivate(String.valueOf(org.isPrivate()));
 		
 		//find out if user is a subscriber to organization
 		User loggedIn = getUser();
@@ -438,6 +443,17 @@ public ResponseEntity<?> getTags() {
 		org.declineInvite(user);
 		organizationRepository.save(org);
 		return new ResponseEntity<Object>("You have denied this user access to the organization", HttpStatus.OK);
+	}
+	
+	@GetMapping({"/privateUser/{organizationId}"})
+	public ResponseEntity<?> privateUser(@PathVariable Long organizationId) {
+		
+		Organization organization = organizationRepository.findOne(organizationId);
+		User user = getUser();
+		if (organization.getPrivateUsers().containsKey(user)) {
+				return ResponseEntity.status(HttpStatus.OK).body(organization.getPrivateUsers().get(user));
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(false);
 	}
 	
 	

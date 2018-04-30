@@ -67,7 +67,7 @@ class OrganizationList extends React.Component {
                     <Text style={styles.largeText}>You are not subscribed to any organizations.</Text>
                     <Text style={styles.largeText}>You can search for some by clicking the button below, or adding your own with the + button above.</Text>
                     <TouchableOpacity style={styles.organizationSearchButton}  onPress={() => that.props.navigation.navigate('Search')}>
-                        <Iconz name="md-search" color="#6b52ae" size={300} style={{marginRight: 20}}/>
+                        <Iconz name="md-search" color="#6b52ae" size={300} />
                     </TouchableOpacity>
                 </View>
             )

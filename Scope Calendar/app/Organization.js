@@ -52,6 +52,7 @@ class OrganizationProfile extends React.Component {
             isPrivate: null,
             isAdmin: null,
             seeModal: false,
+            isAllowedToView: null,
             ModalKey: 0,
 
             evtId: 0,
@@ -270,6 +271,17 @@ class OrganizationProfile extends React.Component {
         })
     }
 
+    checkPrivate(){
+        fetch( Settings.HOME_URL + '/organization/privateUser/' + this.props.Id)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                return responseJson;
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
     render() {
         if(!this.state.ready){
             return null;
@@ -278,6 +290,13 @@ class OrganizationProfile extends React.Component {
         var yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         var wide = Dimensions.get('window').width;
+        if (this.state.isPrivate) {
+            if (!this.checkPrivate()) {
+                return (<View style={styles.bodyView}>
+                    <Text style={styles.largeText}>This organization is private and you are not allowed to view it</Text>
+                </View>)
+            }
+        }
         return (
             <View style={styles.bodyView} ref="OrganizationRef">
                 <View style={{ justifyContent:'space-between', flexDirection:'row', alignItems: 'stretch'}}>

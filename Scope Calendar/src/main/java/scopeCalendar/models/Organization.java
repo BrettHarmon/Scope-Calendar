@@ -144,11 +144,6 @@ public class Organization implements Serializable {
 	{
 		this.isPrivate = isPrivate;
 	}
-
-	public boolean getPrivate()
-	{
-		return isPrivate;
-	}
 	
 	public Map<User, Boolean> getPrivateUsers() {
 		return privateUsers;
