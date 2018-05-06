@@ -71,7 +71,7 @@ class LoginBox extends React.Component {
                     })
                         .then((response) => {
                             return response.json().then(function (json) {
-                                username = json.username;
+                                let username = json.username;
                                 if(username == 'anonymousUser'){ //ran in debug with all authentication allowed
                                     return null;
                                 }

@@ -20,7 +20,7 @@ import {OrganizationListScreen} from "./OrganizationList";
 import {CreateEventScreen} from "./CreateEvent";
 import {SearchScreen} from "./Search";
 
-import{ testView } from './Home'
+import{ LogOutView } from './Home'
 
 
 /*
@@ -187,8 +187,8 @@ const RootStack = StackNavigator(
         Search: {
             screen: SearchScreen,
         },
-        Playground: {
-            screen: testView,
+        Logout: {
+            screen: LogOutView,
         }
     },
     {
@@ -213,8 +213,8 @@ const Drawer = DrawerNavigator({
         Search: {
             screen: SearchScreen,
         },
-        Playground: {
-            screen: testView,
+        Logout: {
+            screen: LogOutView,
         }
         //CreateAccount: {
         //    screen: CreateAccountScreen,

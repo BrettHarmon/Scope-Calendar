@@ -83,6 +83,7 @@ import scopeCalendar.services.CustomUserDetailsService;
 	                .and()
 	                .httpBasic().and().csrf().disable()
 	            .logout()
+	            	.logoutUrl("/logout").deleteCookies("JSESSIONID")
 	                .permitAll();
 	        
 	        if(Application.DEBUG_MODE) {

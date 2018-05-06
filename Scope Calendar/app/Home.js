@@ -1,6 +1,7 @@
 
 import React from 'react';
-import {Button, Dimensions, ScrollView, Text, View, AsyncStorage, TouchableOpacity} from 'react-native';
+import {Button, Dimensions, ScrollView, Text, View, AsyncStorage,
+          TouchableOpacity, DeviceEventEmitter} from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import update from 'immutability-helper';
 import Iconz from 'react-native-vector-icons/Ionicons';  //https://ionicframework.com/docs/ionicons/
@@ -291,15 +292,31 @@ export class NotLoggedInHome extends React.Component {
   }
 }
 
-export class testView extends React.Component{
+export class LogOutView extends React.Component{
     constructor(props){
       super(props);
     }
+
+    static navigationOptions = {
+        drawerLabel: "Log out",
+        title: 'Logging out...',
+    };
+
+    componentWillMount(){
+      let that = this;
+      fetch( Settings.HOME_URL + '/logout', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+        })
+          .then((response) => {
+              DeviceEventEmitter.emit('refreshHome',  null);
+              that.props.navigation.popToTop(); //go back to start
+          })
+    }
+
     render(){
         return(
-            <View style={styles.container}>
-
-            </View>
+            <LoadingSpinner/>
         )
     }
 }
