@@ -55,11 +55,15 @@ public class CompoundModels {
 		public Organization organization;
 		
 		public List<String> tags;
+		public String isPrivate;
 		public Organization getOrganization() {
 			return organization;
 		}
 		public List<String> getTags() {
 			return tags;
+		}
+		public String getIsPrivate() {
+			return isPrivate;
 		}
 
 

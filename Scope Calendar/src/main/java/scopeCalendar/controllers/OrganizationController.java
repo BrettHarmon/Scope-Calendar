@@ -83,11 +83,17 @@ public class OrganizationController {
 		userInput.getOrganization().setSubbedUsers(new HashSet<User>());
 		userInput.getOrganization().setEvents(new HashSet<Event>());
 		userInput.getOrganization().addSubscriber(user);
+		System.out.println("" + userInput.getIsPrivate());
+		
+		//read private string
+		if (userInput.isPrivate.equals("true")) {
+			userInput.getOrganization().setPrivate(true);
+			userInput.getOrganization().sendInvite(user);
+		} else {
+			userInput.getOrganization().setPrivate(false);
+		}
 		
 		//add owner to private list if organization is private
-		if (userInput.getOrganization().isPrivate()) {
-		userInput.getOrganization().sendInvite(user);
-		}
 		
 		//this is tag creation
 		for (String tagName: userInput.getTags()) {
@@ -450,10 +456,19 @@ public ResponseEntity<?> getTags() {
 		
 		Organization organization = organizationRepository.findOne(organizationId);
 		User user = getUser();
+		System.out.println("HELLO     " + organization.getPrivateUsers().get(user));
+		HashMap<String, String> response = new HashMap<>();
 		if (organization.getPrivateUsers().containsKey(user)) {
-				return ResponseEntity.status(HttpStatus.OK).body(organization.getPrivateUsers().get(user));
+			if (organization.getPrivateUsers().get(user)) {
+				response.put("allowed", "true");
+				return new ResponseEntity<Object>(response, HttpStatus.OK);
+			} else {
+				response.put("allowed", "false");
+				return new ResponseEntity<Object>(response, HttpStatus.OK);
+			}
 		}
-		return ResponseEntity.status(HttpStatus.OK).body(false);
+		response.put("allowed", "invite");
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 	
 	

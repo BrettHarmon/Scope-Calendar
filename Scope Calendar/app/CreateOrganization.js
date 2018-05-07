@@ -54,9 +54,14 @@ class CreateOrganizationBox extends React.Component {
     createOrganization(event) {
         let name = this.state.name;
         let description = this.state.description;
-        let isPrivate = this.state.isPrivate;
+        let isPrivate = '';
+        if (this.state.isPrivate) {
+            isPrivate = 'true';
+        } else {
+            isPrivate = 'false';
+        }
         let tags = this.state.tags.map(object => object.name);
-        console.log(tags);
+        console.log(isPrivate);
         var that = this;
         return(fetch( Settings.HOME_URL + '/organization/create', {
             method: 'POST',
@@ -68,9 +73,10 @@ class CreateOrganizationBox extends React.Component {
                 organization:{
                     name: name,
                     description: description,
-                    isPrivate: isPrivate,
+
                 },
                 tags: tags,
+                isPrivate: isPrivate,
             })
         })
             .then((response) => {

@@ -46,12 +46,14 @@ class OrganizationProfile extends React.Component {
             name : 'Organization Profile',
             subscribed: null,
             subscribers: 0,
+            id: "",
             description : '',
             upcomingEvents: {},
             selected: null,
             isPrivate: null,
             isAdmin: null,
             seeModal: false,
+            isLoading: true,
             isAllowedToView: null,
             ModalKey: 0,
 
@@ -85,6 +87,7 @@ class OrganizationProfile extends React.Component {
                         selected: org.firstEvent,
                         isPrivate: org.isPrivate,
                         isAdmin: org.isAdmin,
+                        id: this.props.Id,
                     });
 
                 }else{
@@ -95,6 +98,7 @@ class OrganizationProfile extends React.Component {
 
     componentWillMount(){
         this.buildOrganization();
+        this.checkPrivate();
     }
 
     componentDidMount() {
@@ -213,7 +217,7 @@ class OrganizationProfile extends React.Component {
 
     SubscribeButton(){
 
-        if(this.state.subscribed && !this.state.isPrivate){
+        if(this.state.subscribed){
             //Display a subscribed button
             return(
                 <TouchableOpacity style={styles.SubscribeButton}
@@ -230,7 +234,7 @@ class OrganizationProfile extends React.Component {
                     <Iconz name="md-checkmark" style={{paddingLeft: 5}} color ="#fff" size={20}/>
                 </TouchableOpacity>
             );
-        }else if (!this.state.subscribed && !this.state.isPrivate){
+        }else if (!this.state.subscribed){
             return(
                 <TouchableOpacity style={styles.SubscribeButton }  onPress={() => {this.OrganizationSub()}}>
                     <Text style={{color:'#fff', fontWeight:'bold' }}>Subscribe</Text>
@@ -272,10 +276,15 @@ class OrganizationProfile extends React.Component {
     }
 
     checkPrivate(){
+
         fetch( Settings.HOME_URL + '/organization/privateUser/' + this.props.Id)
             .then((response) => response.json())
             .then((responseJson) => {
-                return responseJson;
+                if (responseJson.allowed === "true") {
+                    this.setState({isAllowedToView: true});
+                } else {
+                    this.setState({isAllowedToView: false});
+                }
             })
             .catch((error) => {
                 console.error(error);
@@ -287,15 +296,14 @@ class OrganizationProfile extends React.Component {
             return null;
         }
         let that = this;
+        console.log(this.state.isPrivate);
         var yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         var wide = Dimensions.get('window').width;
-        if (this.state.isPrivate) {
-            if (!this.checkPrivate()) {
+        if (!this.state.isAllowedToView && this.state.isPrivate) {
                 return (<View style={styles.bodyView}>
                     <Text style={styles.largeText}>This organization is private and you are not allowed to view it</Text>
                 </View>)
-            }
         }
         return (
             <View style={styles.bodyView} ref="OrganizationRef">
